@@ -759,7 +759,10 @@
     _globalEventsHooked: false,
     _hookedVideos: new WeakSet(),
     _userMuted: false,
+    _userPaused: false,
+    _isAudioBuffering: false,
     _isInternalVideoSync: false,
+    _hasDispatchedEnded: false,
     _reconnectAttempts: 0,
     _lastAudioTime: -1,
     _lastAudioAdvance: 0,
@@ -790,11 +793,12 @@
           console.warn(TAG, `[StudioEngine774] Stream error (code: ${err?.code}, message: ${err?.message}) on source: ${currentSrc}`);
 
           if (err && (err.code === MediaError.MEDIA_ERR_NETWORK || err.code === MediaError.MEDIA_ERR_DECODE || err.code === 4)) {
-            if ((this._reconnectAttempts || 0) < 1) {
-              console.log(TAG, `[StudioEngine774] Attempting auto-reconnect (${this._reconnectAttempts + 1}/1, error code: ${err?.code})...`);
+            if ((this._reconnectAttempts || 0) < 3) {
+              const delay = 500 * Math.pow(2, this._reconnectAttempts || 0);
+              console.log(TAG, `[StudioEngine774] Network/decode hiccup. Auto-reconnecting in ${delay}ms (${(this._reconnectAttempts || 0) + 1}/3, error code: ${err?.code})...`);
               setTimeout(() => {
                 if (this.isActive) this._reconnectStream('Media error recovery');
-              }, 400);
+              }, delay);
               return;
             }
           }
@@ -819,11 +823,32 @@
           }
         });
 
+        const onAudioBufferReady = () => {
+          if (!this.isActive || this.isAdActive()) return;
+          if (this._isAudioBuffering) {
+            this._isAudioBuffering = false;
+            this._audioStalledAt = 0;
+            console.log(TAG, '[StudioEngine774] Audio buffer replenished. Resuming video sync...');
+            if (!document.hidden) {
+              const video = getMainVideoElement();
+              if (video && video.paused && !this._userPaused) {
+                this._isInternalVideoSync = true;
+                video.play().catch(() => {});
+                setTimeout(() => { this._isInternalVideoSync = false; }, 200);
+              }
+            }
+          }
+        };
+
+        this.audio.addEventListener('canplay', onAudioBufferReady);
+        this.audio.addEventListener('canplaythrough', onAudioBufferReady);
+
         // When 774 audio is ACTUALLY playing, seamlessly silence native video and sync clocks
         this.audio.addEventListener('playing', () => {
           this._reconnectAttempts = 0;
           this._lastAudioTime = this.audio.currentTime;
           this._lastAudioAdvance = Date.now();
+          onAudioBufferReady();
           if (this.isActive && !this.isAdActive()) {
             const video = getMainVideoElement();
             if (video) {
@@ -840,22 +865,31 @@
         this.audio.addEventListener('waiting', () => {
           if (!this.isActive || this.isAdActive()) return;
           this._audioStalledAt = Date.now();
+          this._isAudioBuffering = true;
+          // Coordinated buffering: pause video so it does not pull ahead while audio downloads packets
+          if (!document.hidden) {
+            const video = getMainVideoElement();
+            if (video && !video.paused && !video.seeking && !this._isInternalVideoSync) {
+              this._isInternalVideoSync = true;
+              try { video.pause(); } catch (e) {}
+              setTimeout(() => { this._isInternalVideoSync = false; }, 200);
+            }
+          }
         });
 
         this.audio.addEventListener('stalled', () => {
           if (!this.isActive || this.isAdActive()) return;
           this._audioStalledAt = Date.now();
-          const video = getMainVideoElement();
-          if (video && !video.paused && !video.seeking) {
-            setTimeout(() => {
-              if (this.isActive && this.audio && !this.audio.paused) {
-                const v = getMainVideoElement();
-                if (v && !v.paused && Math.abs(this.audio.currentTime - v.currentTime) > 0.4) {
-                  console.log(TAG, '[StudioEngine774] Audio stalled. Nudging audio currentTime to unblock...');
-                  this.audio.currentTime = v.currentTime;
-                }
-              }
-            }, 1000);
+          this._isAudioBuffering = true;
+          // Network stall: do NOT seek audio currentTime! Seeking resets network connection and dumps buffer!
+          // Simply pause video to hold frame while audio downloads over congested network.
+          if (!document.hidden) {
+            const video = getMainVideoElement();
+            if (video && !video.paused && !video.seeking && !this._isInternalVideoSync) {
+              this._isInternalVideoSync = true;
+              try { video.pause(); } catch (e) {}
+              setTimeout(() => { this._isInternalVideoSync = false; }, 200);
+            }
           }
         });
 
@@ -868,8 +902,11 @@
 
         this.audio.addEventListener('ended', () => {
           if (!this.isActive) return;
-          console.log(TAG, '[StudioEngine774] Audio playback completed. Advancing player clock...');
+          console.log(TAG, '[StudioEngine774] Audio playback completed. Evaluating autoplay/playlist state...');
           const video = getMainVideoElement();
+          const player = document.getElementById('movie_player');
+          const shouldAdvance = this.shouldAutoplayNext();
+
           if (video) {
             this._isInternalVideoSync = true;
             try {
@@ -877,25 +914,110 @@
                 video.currentTime = video.duration;
               }
             } catch (e) {}
-            video.dispatchEvent(new Event('ended', { bubbles: true }));
+            if (shouldAdvance) {
+              video.dispatchEvent(new Event('ended', { bubbles: true }));
+            } else {
+              try { video.pause(); } catch (e) {}
+            }
             setTimeout(() => { this._isInternalVideoSync = false; }, 250);
           }
-          const player = document.getElementById('movie_player');
-          if (player) {
-            setTimeout(() => {
-              if (this.isActive && (!player.getVideoData?.()?.video_id || player.getVideoData?.()?.video_id === this.activeVideoId)) {
-                if (typeof player.nextVideo === 'function') {
-                  console.log(TAG, '[StudioEngine774] Advancing to next video via player.nextVideo()...');
-                  try { player.nextVideo(); } catch (e) {}
+
+          if (shouldAdvance) {
+            if (player) {
+              setTimeout(() => {
+                if (this.isActive && (!player.getVideoData?.()?.video_id || player.getVideoData?.()?.video_id === this.activeVideoId)) {
+                  if (typeof player.nextVideo === 'function') {
+                    console.log(TAG, '[StudioEngine774] Advancing to next video via player.nextVideo()...');
+                    try { player.nextVideo(); } catch (e) {}
+                  }
                 }
-              }
-            }, 1200);
+              }, 1200);
+            }
+          } else {
+            console.log(TAG, '[StudioEngine774] Video finished. Autoplay is OFF and not in a playlist; halting playback.');
+            if (player && typeof player.pauseVideo === 'function') {
+              try { player.pauseVideo(); } catch (e) {}
+            }
+            this.stopAndUnmute('Playback ended (autoplay disabled)');
           }
         });
       }
 
       this.hookGlobalEvents();
       this.hookPlayer();
+    },
+
+    shouldAutoplayNext() {
+      const player = document.getElementById('movie_player');
+
+      // 1. Check if genuinely in an active playlist (URL must have `list=`)
+      // Note: player.getPlaylist() returns an array of up-next recommendations even for standalone videos!
+      // Therefore, we MUST verify that `list=` is actually in the query string.
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const listParam = urlParams.get('list');
+        if (listParam && listParam !== '') {
+          const plId = (player && typeof player.getPlaylistId === 'function') ? player.getPlaylistId() : null;
+          const plPanel = document.querySelector('ytd-playlist-panel-renderer');
+
+          if (plId || plPanel) {
+            if (player && typeof player.getPlaylist === 'function') {
+              const pl = player.getPlaylist();
+              const idx = (typeof player.getPlaylistIndex === 'function') ? player.getPlaylistIndex() : -1;
+              if (Array.isArray(pl) && pl.length > 1 && idx >= 0 && idx < pl.length - 1) {
+                return true;
+              }
+            }
+
+            if (plPanel) {
+              const items = plPanel.querySelectorAll('ytd-playlist-panel-video-renderer');
+              const selected = plPanel.querySelector('ytd-playlist-panel-video-renderer[selected]');
+              if (items.length > 1 && selected && selected !== items[items.length - 1]) {
+                return true;
+              }
+            }
+          }
+        }
+      } catch (e) {}
+
+      // 2. Check YouTube player DOM autonav toggle button
+      const autonavBtn = document.querySelector('.ytp-autonav-toggle-button') ||
+                         document.querySelector('.ytp-autonav-toggle-button-container') ||
+                         document.querySelector('[data-tooltip-target-id="ytp-autonav-toggle-button"]');
+      if (autonavBtn) {
+        const checked = autonavBtn.getAttribute('aria-checked') ||
+                        autonavBtn.querySelector('[aria-checked]')?.getAttribute('aria-checked') ||
+                        autonavBtn.closest('[aria-checked]')?.getAttribute('aria-checked');
+        if (checked === 'true') return true;
+        if (checked === 'false') return false;
+      }
+
+      // 3. Check YouTube player API for autonav state: 2 = ON, 1 = OFF
+      if (player && typeof player.getAutonavState === 'function') {
+        try {
+          const state = player.getAutonavState();
+          if (state === 2) return true;
+          if (state === 1) return false;
+        } catch (e) {}
+      }
+
+      // 4. Check sessionStorage / localStorage ('yt-player-autonavstate')
+      try {
+        const raw = sessionStorage.getItem('yt-player-autonavstate') || localStorage.getItem('yt-player-autonavstate');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed?.data === '2' || parsed?.data === 2 || parsed?.data === true) return true;
+          if (parsed?.data === '1' || parsed?.data === 1 || parsed?.data === false) return false;
+        }
+      } catch (e) {}
+
+      // 5. Check YouTube global config
+      try {
+        const ytcfgAuto = window.ytcfg?.get('AUTONAV_SETTINGS')?.isAutonavEnabled;
+        if (typeof ytcfgAuto === 'boolean') return ytcfgAuto;
+      } catch (e) {}
+
+      return false;
     },
 
     _silenceElement(el) {
@@ -1046,6 +1168,7 @@
         }
 
         if (e.type === 'play' || e.type === 'playing') {
+          this._userPaused = false;
           // Playback Safety Guard: verify audio engine is playing for current active video
           if (this.isActive && this.activeVideoId && !isCurrentWatchVideo(this.activeVideoId)) {
             console.warn(TAG, `[PlaybackSafetyGuard] Audio engine playing ${this.activeVideoId} but video is no longer active! Stopping stale audio.`);
@@ -1086,6 +1209,7 @@
           }
         } else if (e.type === 'pause') {
           if (!document.hidden && !this._isInternalVideoSync) {
+            this._userPaused = true;
             this.audio.pause();
           }
         } else if (e.type === 'seeking' || e.type === 'seeked') {
@@ -1367,10 +1491,20 @@
         // Audio already completed while tab was hidden: advance video immediately to end
         this._isInternalVideoSync = true;
         if (video.duration) video.currentTime = video.duration;
-        video.dispatchEvent(new Event('ended', { bubbles: true }));
-        const player = document.getElementById('movie_player');
-        if (player && typeof player.nextVideo === 'function') {
-          try { player.nextVideo(); } catch (e) {}
+        const shouldAdvance = this.shouldAutoplayNext();
+        if (shouldAdvance) {
+          video.dispatchEvent(new Event('ended', { bubbles: true }));
+          const player = document.getElementById('movie_player');
+          if (player && typeof player.nextVideo === 'function') {
+            try { player.nextVideo(); } catch (e) {}
+          }
+        } else {
+          try { video.pause(); } catch (e) {}
+          const player = document.getElementById('movie_player');
+          if (player && typeof player.pauseVideo === 'function') {
+            try { player.pauseVideo(); } catch (e) {}
+          }
+          this.stopAndUnmute('Playback ended while hidden (autoplay disabled)');
         }
         setTimeout(() => { this._isInternalVideoSync = false; }, 250);
       } else if (video.paused && !this.audio.paused) {
@@ -1387,7 +1521,7 @@
       if (!streamUrl) return;
 
       this._reconnectAttempts = (this._reconnectAttempts || 0) + 1;
-      if (this._reconnectAttempts > 3) {
+      if (this._reconnectAttempts > 4) {
         console.warn(TAG, '[StudioEngine774] Exceeded max reconnect attempts');
         if (S.operationMode === OP_MODES.HYBRID_HQ) {
           const currentVid = this.activeVideoId || getVideoIdFromUrl();
@@ -1411,7 +1545,9 @@
 
       this.audio.src = streamUrl;
       this.audio.load();
-      this.audio.currentTime = targetTime;
+      if (targetTime > 0.05) {
+        try { this.audio.currentTime = targetTime; } catch (e) {}
+      }
       if (video) {
         this.audio.playbackRate = video.playbackRate;
         this.syncVol(video);
@@ -1480,10 +1616,17 @@
             setTimeout(() => { this._isInternalVideoSync = false; }, 200);
           }
           if (video.duration && aTime >= video.duration - 0.5) {
-            this._isInternalVideoSync = true;
-            video.currentTime = video.duration;
-            video.dispatchEvent(new Event('ended', { bubbles: true }));
-            setTimeout(() => { this._isInternalVideoSync = false; }, 200);
+            if (!this._hasDispatchedEnded) {
+              this._hasDispatchedEnded = true;
+              this._isInternalVideoSync = true;
+              video.currentTime = video.duration;
+              if (this.shouldAutoplayNext()) {
+                video.dispatchEvent(new Event('ended', { bubbles: true }));
+              } else {
+                try { video.pause(); } catch (e) {}
+              }
+              setTimeout(() => { this._isInternalVideoSync = false; }, 200);
+            }
           }
         }
         return;
@@ -1505,16 +1648,28 @@
       const vTime = video.currentTime;
       const aTime = this.audio.currentTime;
 
-      // 1. Detect frozen / stalled audio stream
+      // Check if audio is currently buffering due to network congestion
+      const isBuffering = this._isAudioBuffering || (this.audio.readyState < 3 && this.audio.networkState === HTMLMediaElement.NETWORK_LOADING);
+
+      // If audio is buffering due to network congestion, hold video frame and allow buffer to fill
+      if (isBuffering) {
+        if (!video.paused && !this._isInternalVideoSync) {
+          this._isInternalVideoSync = true;
+          try { video.pause(); } catch (e) {}
+          setTimeout(() => { this._isInternalVideoSync = false; }, 200);
+        }
+        return;
+      }
+
+      // 1. Detect frozen / stalled audio stream (not merely buffering)
       if (Math.abs(aTime - this._lastAudioTime) < 0.05 && !this.audio.paused) {
         const stalledDuration = Date.now() - (this._lastAudioAdvance || Date.now());
-        if (stalledDuration > 2500) {
+        if (stalledDuration > 8000) {
           console.warn(TAG, `[StudioEngine774 Watchdog] Audio frozen at ${aTime.toFixed(2)}s for ${(stalledDuration / 1000).toFixed(1)}s (video at ${vTime.toFixed(2)}s). Auto-recovering...`);
           this._lastAudioAdvance = Date.now();
-          if (stalledDuration > 5000) {
+          if (stalledDuration > 15000) {
             this._reconnectStream('Watchdog detected frozen stream');
           } else {
-            this.audio.currentTime = vTime;
             this.audio.play().catch(() => {});
           }
           return;
@@ -1525,7 +1680,7 @@
       }
 
       // 2. Audio paused while video is playing
-      if (this.audio.paused && !video.paused) {
+      if (this.audio.paused && !video.paused && !this._isAudioBuffering) {
         this.audio.play().catch(() => {});
       }
 
@@ -1537,7 +1692,7 @@
 
       // 4. Video is the MASTER CLOCK. Align audio clock only on genuine large drift (> 1.5s)
       const absDiff = Math.abs(aTime - vTime);
-      if (absDiff > 1.5 && !video.seeking && !this._isVolScrubbing) {
+      if (absDiff > 1.5 && !video.seeking && !this._isVolScrubbing && !this._isAudioBuffering) {
         this.audio.currentTime = vTime;
       }
     },
@@ -1561,6 +1716,9 @@
       this.best774Candidate = best774;
       this.isActive = true;
       this._reconnectAttempts = 0;
+      this._isAudioBuffering = false;
+      this._userPaused = false;
+      this._hasDispatchedEnded = false;
       this.updateNormalizedGain();
 
       this.hookVideo(mainVideo);
@@ -1672,6 +1830,9 @@
       this.best774Candidate = null;
       this.pending774 = null;
       this._reconnectAttempts = 0;
+      this._isAudioBuffering = false;
+      this._userPaused = false;
+      this._hasDispatchedEnded = false;
       this.stopWatchdog();
       if (this._waiterTimer) {
         clearInterval(this._waiterTimer);

@@ -4,7 +4,7 @@
   <p><b>Force 100% Genuine Studio Opus 774 Audio on YouTube via Dual-Stream Synchronization Engine</b></p>
 
   <p>
-    <a href="https://github.com/alithw/YTSpoofingStream/releases"><img src="https://img.shields.io/badge/release-v0.1.4-blue.svg?style=flat-square" alt="Latest Release"></a>
+    <a href="https://github.com/alithw/YTSpoofingStream/releases"><img src="https://img.shields.io/badge/release-v0.1.5-blue.svg?style=flat-square" alt="Latest Release"></a>
     <img src="https://img.shields.io/badge/manifest-v3-green.svg?style=flat-square" alt="Manifest V3">
     <img src="https://img.shields.io/badge/license-MIT-orange.svg?style=flat-square" alt="License MIT">
     <img src="https://img.shields.io/badge/platform-Chrome%20%7C%20Edge%20%7C%20Brave-lightgrey?style=flat-square" alt="Platforms">
@@ -29,7 +29,7 @@
 > [!TIP]
 > **Using Mozilla Firefox / Firefox ESR?**  
 > This branch (`main`) is configured specifically for **Chromium-based browsers** (Google Chrome, Brave, Microsoft Edge, Opera).  
-> If you are using **Mozilla Firefox**, please switch to the [**`firefox`**](https://github.com/alithw/YTSpoofingStream/tree/firefox) branch or download the pre-signed [**`YTSS-0.1.4.xpi`**](https://github.com/alithw/YTSpoofingStream/raw/firefox/YTSS-0.1.4.xpi) package for instant permanent installation!
+> If you are using **Mozilla Firefox**, please switch to the [**`firefox`**](https://github.com/alithw/YTSpoofingStream/tree/firefox) branch or download the pre-signed [**`YTSS-0.1.5.xpi`**](https://github.com/alithw/YTSpoofingStream/raw/firefox/YTSS-0.1.5.xpi) package for instant permanent installation!
 
 *Read this in other languages: [Tiếng Việt](README-vi.md).*
 
@@ -140,6 +140,10 @@ In v0.1.3, the audio engine acts as the continuous master clock:
 | **`HYBRID_HQ`** *(Recommended)* | Hybrid Mix | YouTube Music Web + TVHTML5 | Cancels if no genuine 774 exists | Everyday YouTube watching & music videos |
 | **`YTM_HARVESTER`** | YTM Harvester | Direct HTTPS from YouTube Music Premium | Cancels if no 774 stream | High-fidelity music tracks |
 | **`TV_HEADLESS`** | Smart TV Relay | Deciphered TVHTML5 Living Room | Cancels if no TV login / 774 | UGC tracks and videos not indexed on YTM |
+
+> [!NOTE]
+> **Audio Loudness Characteristics (YouTube Music vs Standard YouTube)**:  
+> Audio streams harvested from **YouTube Music (`YTM_HARVESTER`)** typically have a noticeably higher perceived loudness compared to regular YouTube video audio (approximately **+3dB to +6dB** louder). This is because YouTube Music master tracks follow dedicated music streaming loudness standards (-14 LUFS) and different dynamic compression targets compared to standard YouTube video uploads.
 
 ---
 

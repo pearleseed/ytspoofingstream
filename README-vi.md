@@ -4,7 +4,7 @@
   <p><b>Kích Hoạt 100% Luồng Âm Thanh Studio Opus 774 Chuẩn Phòng Thu Trên Trình Duyệt YouTube</b></p>
 
   <p>
-    <a href="https://github.com/alithw/YTSpoofingStream/releases"><img src="https://img.shields.io/badge/release-v0.1.4-blue.svg?style=flat-square" alt="Phiên bản Mới nhất"></a>
+    <a href="https://github.com/alithw/YTSpoofingStream/releases"><img src="https://img.shields.io/badge/release-v0.1.5-blue.svg?style=flat-square" alt="Phiên bản Mới nhất"></a>
     <img src="https://img.shields.io/badge/manifest-v3-green.svg?style=flat-square" alt="Manifest V3">
     <img src="https://img.shields.io/badge/license-MIT-orange.svg?style=flat-square" alt="Giấy phép MIT">
     <img src="https://img.shields.io/badge/platform-Chrome%20%7C%20Edge%20%7C%20Brave-lightgrey?style=flat-square" alt="Nền tảng hỗ trợ">
@@ -29,7 +29,7 @@
 > [!TIP]
 > **Bạn đang sử dụng Mozilla Firefox / Firefox ESR?**  
 > Nhánh này (`main`) được cấu hình dành riêng cho **các trình duyệt Chromium** (Google Chrome, Brave, Microsoft Edge, Cốc Cốc, Opera).  
-> Nếu bạn sử dụng **Mozilla Firefox**, vui lòng chuyển sang nhánh [**`firefox`**](https://github.com/alithw/YTSpoofingStream/tree/firefox) hoặc tải trực tiếp gói cài đặt đã ký số [**`YTSS-0.1.4.xpi`**](https://github.com/alithw/YTSpoofingStream/raw/firefox/YTSS-0.1.4.xpi) để cài đặt vĩnh viễn!
+> Nếu bạn sử dụng **Mozilla Firefox**, vui lòng chuyển sang nhánh [**`firefox`**](https://github.com/alithw/YTSpoofingStream/tree/firefox) hoặc tải trực tiếp gói cài đặt đã ký số [**`YTSS-0.1.5.xpi`**](https://github.com/alithw/YTSpoofingStream/raw/firefox/YTSS-0.1.5.xpi) để cài đặt vĩnh viễn!
 
 *Đọc bằng ngôn ngữ khác: [English](README.md).*
 
@@ -140,6 +140,10 @@ Khi can thiệp `video.muted = true` trực tiếp trên DOM của thẻ `<video
 | **`HYBRID_HQ`** *(Khuyên dùng)* | Hybrid Mix | YouTube Music Web + TVHTML5 | Tự động hủy can thiệp, phát gốc | Xem video YouTube hàng ngày, MV ca nhạc |
 | **`YTM_HARVESTER`** | YTM Harvester | Trực tiếp HTTPS từ YouTube Music Premium | Hủy can thiệp nếu không có 774 | Nghe nhạc chất lượng cao nhất |
 | **`TV_HEADLESS`** | Smart TV Relay | Luồng giải mã TVHTML5 Living Room | Hủy can thiệp nếu thiếu TV login/774 | Các bài cover, track UGC không có trên YTM |
+
+> [!NOTE]
+> **Đặc tính mức âm lượng (YouTube Music vs YouTube thông thường)**:  
+> Các luồng âm thanh được thu hoạch từ **YouTube Music (`YTM_HARVESTER`)** thường có mức âm lượng (loudness) lớn hơn so với âm thanh video YouTube thông thường khoảng **3dB đến 6dB**. Nguyên nhân là do các bản thu trên YouTube Music được áp dụng tiêu chuẩn mastering và target loudness chuyên biệt cho stream nhạc (-14 LUFS) thay vì chuẩn nén dynamic của video tải lên trên YouTube Web thông thường.
 
 ---
 
