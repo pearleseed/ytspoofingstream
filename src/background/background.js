@@ -759,7 +759,7 @@ async function ensureOffscreenDocument() {
     }
     try {
       await chrome.offscreen.createDocument({
-        url: 'harvester.html',
+        url: 'src/offscreen/harvester.html',
         reasons: ['IFRAME_SCRIPTING', 'DOM_PARSER', 'AUDIO_PLAYBACK'],
         justification: 'Harvest HQ audio streams from YouTube Music and TV',
       });

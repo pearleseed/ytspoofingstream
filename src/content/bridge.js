@@ -33,8 +33,42 @@ function safeSend(msg, callback, retryCount = 0) {
   }
 }
 
+// Settings the MAIN world is allowed to see. `chrome.storage.local` also holds
+// `tvOAuthToken` (access_token + refresh_token). Posting the whole storage area
+// into the page handed those tokens to youtube.com — and to anything else running
+// in the page — so only these keys ever cross the boundary.
+const EXPOSED_SETTINGS = [
+  'enabled',
+  'hqFetch',
+  'forceOverride',
+  'autoReload',
+  'audioMode',
+  'preferredClient',
+  'rawItag',
+  'shadowPlayer',
+  'shadowVolume',
+  'operationMode',
+  'lang',
+];
+
+function pickSettings(data) {
+  const out = {};
+  if (!data) return out;
+  for (const key of EXPOSED_SETTINGS) {
+    if (data[key] !== undefined) out[key] = data[key];
+  }
+  return out;
+}
+
 window.addEventListener('message', (event) => {
   if (event.source !== window || !event.data) return;
+
+  if (event.data.type === 'YTSS_SAVE_SETTINGS' && event.data.settings) {
+    const settings = pickSettings(event.data.settings);
+    if (Object.keys(settings).length > 0) {
+      chrome.storage.local.set(settings);
+    }
+  }
 
   if (event.data.type === 'YTSS_FETCH_HQ') {
     const { videoId, title, author, requestId, context, opMode, preferredSource, excludeSource } = event.data;
@@ -95,32 +129,6 @@ chrome.runtime.onMessage.addListener((msg) => {
     window.postMessage({ type: 'YTSS_TRIGGER_UPGRADE', videoId: msg.videoId }, '*');
   }
 });
-
-// Settings the MAIN world is allowed to see. `chrome.storage.local` also holds
-// `tvOAuthToken` (access_token + refresh_token). Posting the whole storage area
-// into the page handed those tokens to youtube.com — and to anything else running
-// in the page — so only these keys ever cross the boundary.
-const EXPOSED_SETTINGS = [
-  'enabled',
-  'hqFetch',
-  'forceOverride',
-  'autoReload',
-  'audioMode',
-  'preferredClient',
-  'rawItag',
-  'shadowPlayer',
-  'shadowVolume',
-  'operationMode',
-];
-
-function pickSettings(data) {
-  const out = {};
-  if (!data) return out;
-  for (const key of EXPOSED_SETTINGS) {
-    if (data[key] !== undefined) out[key] = data[key];
-  }
-  return out;
-}
 
 function pushSettings() {
   chrome.storage.local.get(EXPOSED_SETTINGS, (data) => {

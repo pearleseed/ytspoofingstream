@@ -5,6 +5,98 @@
   const $ = (s) => document.querySelector(s);
   const log = (msg) => console.log('[YTSS Popup]', msg);
 
+  // ─── TRANSLATION DICTIONARY ───────────────────────────────────────
+  const I18N = {
+    vi: {
+      hdr_ver: 'v0.1.6 &bull; Engine Luồng Kép Studio 774',
+      enable_ext: 'Kích hoạt Extension',
+      sec_opmode: 'Chế độ hoạt động',
+      mode_hybrid_name: 'Chế độ: Hybrid Mix (774 Opus ★)',
+      badge_recommended: 'Khuyên dùng',
+      mode_hybrid_desc: 'Khớp chuẩn video • Thu nhận Opus 280k+ chuẩn từ YTM & TV • Hủy nếu không có 774',
+      mode_ytm_name: 'Chỉ thu nhận từ YTM (774 Opus ★)',
+      badge_direct_hq: 'Trực tiếp HQ',
+      mode_ytm_desc: 'Khớp chuẩn video • HTTPS trực tiếp Opus 774 từ YouTube Music • Hủy nếu không có 774',
+      mode_tv_name: 'Chỉ chuyển tiếp Smart TV (774 Opus ★)',
+      badge_tv: 'TV Premium',
+      mode_tv_desc: 'Khớp chuẩn video • Cần đăng nhập TV Premium • Chuyển tiếp giải mã 774 • Hủy nếu không có 774',
+      sec_controls: 'Điều khiển',
+      ctrl_autoreload: 'Tự động tải lại trang khi thay đổi',
+      ctrl_stats_title: 'Ghi đè Thống kê chi tiết (Giả lập 774)',
+      ctrl_stats_desc: 'Hiển thị thông số Opus 774 trong Thống kê chi tiết của trình phát',
+      sec_status: 'Trạng thái',
+      st_active: 'Hoạt động',
+      st_inactive: 'Không hoạt động',
+      st_disabled: 'Đã tắt',
+      info_mode: 'Chế độ',
+      info_method: 'Phương thức hoạt động',
+      info_streams: 'Luồng phát',
+      info_audio: 'Âm thanh kích hoạt',
+      sec_actions: 'Thao tác',
+      btn_refresh: '↻ Tải lại trang',
+      btn_reload: '⟳ Tải lại',
+      sec_tv_auth: 'Đăng nhập TVHTML5',
+      tv_status_checking: 'Trạng thái: Đang kiểm tra...',
+      tv_status_logged_in: 'Trạng thái: Đã đăng nhập ({name} đã xác thực)',
+      tv_status_not_logged_in: 'Trạng thái: Chưa đăng nhập',
+      tv_status_waiting: 'Trạng thái: Đang chờ bạn kích hoạt...',
+      tv_status_error: 'Trạng thái: Lỗi - {error}',
+      tv_enter_code: 'Nhập mã tại',
+      btn_tv_login: 'Đăng nhập TV',
+      btn_tv_logout: 'Đăng xuất',
+      tv_loading: 'Đang tải...',
+      method_fallback: 'CHUYỂN VỀ GỐC',
+      method_active_suffix: '(Đang phát)',
+      method_original: 'Âm thanh gốc',
+      sw_active: 'SW: v{version} Hoạt động',
+      sw_offline: 'SW: Ngoại tuyến (Cần tải lại)',
+    },
+    en: {
+      hdr_ver: 'v0.1.6 &bull; Studio 774 Dual-Stream Engine',
+      enable_ext: 'Enable Extension',
+      sec_opmode: 'Operation Mode',
+      mode_hybrid_name: 'Mode: Hybrid Mix (774 Opus ★)',
+      badge_recommended: 'Recommended',
+      mode_hybrid_desc: 'Strict exact video • Harvests genuine Opus 280k+ from YTM & TV • Cancels if no 774',
+      mode_ytm_name: 'YTM Harvester Only (774 Opus ★)',
+      badge_direct_hq: 'Direct HQ',
+      mode_ytm_desc: 'Strict exact video • Direct HTTPS Opus 774 from YouTube Music • Cancels if no 774',
+      mode_tv_name: 'Smart TV Relay Only (774 Opus ★)',
+      badge_tv: 'TV Premium',
+      mode_tv_desc: 'Strict exact video • Requires TV Premium login • Deciphered 774 relay • Cancels if no 774',
+      sec_controls: 'Controls',
+      ctrl_autoreload: 'Auto-reload page on change',
+      ctrl_stats_title: 'Stats for Nerds Override (774 Spoof)',
+      ctrl_stats_desc: 'Display Opus 774 metrics in player Stats for Nerds',
+      sec_status: 'Status',
+      st_active: 'Active',
+      st_inactive: 'Inactive',
+      st_disabled: 'Disabled',
+      info_mode: 'Mode',
+      info_method: 'Active Method',
+      info_streams: 'Streams',
+      info_audio: 'Active Audio',
+      sec_actions: 'Actions',
+      btn_refresh: '↻ Refresh Page',
+      btn_reload: '⟳ Reload',
+      sec_tv_auth: 'TVHTML5 Login',
+      tv_status_checking: 'Status: Checking...',
+      tv_status_logged_in: 'Status: Logged In ({name} Authenticated)',
+      tv_status_not_logged_in: 'Status: Not Logged In',
+      tv_status_waiting: 'Status: Waiting for you to activate...',
+      tv_status_error: 'Status: Error - {error}',
+      tv_enter_code: 'Enter code at',
+      btn_tv_login: 'Login to TV',
+      btn_tv_logout: 'Logout',
+      tv_loading: 'Loading...',
+      method_fallback: 'FALLBACK TO ORIGINAL',
+      method_active_suffix: '(Active)',
+      method_original: 'Original',
+      sw_active: 'SW: v{version} Active',
+      sw_offline: 'SW: Offline (Reload required)',
+    }
+  };
+
   // ─── SETTINGS ────────────────────────────────────────────────────
   const KEYS = {
     enabled: '#en',
@@ -18,11 +110,9 @@
     operationMode: 'HYBRID_HQ',
     shadowPlayer: true,
     shadowVolume: 1.0,
+    lang: 'vi',
   };
 
-  // chrome.storage.local also holds `tvOAuthToken` (access_token + refresh_token).
-  // `settings` gets handed to executeScript and written into the page's localStorage,
-  // so it must never pick up anything outside this list.
   const SETTING_KEYS = Object.keys(settings);
 
   function pickSettings(data) {
@@ -32,6 +122,33 @@
       if (data[key] !== undefined) out[key] = data[key];
     }
     return out;
+  }
+
+  function t(key, vars = {}) {
+    const lang = settings.lang || 'vi';
+    let str = I18N[lang]?.[key] || I18N.en?.[key] || key;
+    for (const [k, v] of Object.entries(vars)) {
+      str = str.replace(new RegExp(`\\{${k}\\}`, 'g'), v);
+    }
+    return str;
+  }
+
+  function applyLanguage() {
+    const lang = settings.lang || 'vi';
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.dataset.i18n;
+      if (I18N[lang] && I18N[lang][key]) {
+        el.innerHTML = I18N[lang][key];
+      }
+    });
+
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.lang === lang);
+    });
+
+    if (typeof refreshAuthStatus === 'function') {
+      refreshAuthStatus();
+    }
   }
 
   // Load from chrome.storage
@@ -46,7 +163,23 @@
       loadLegacy();
     }
     applyUI();
-    log('Settings loaded. OpMode: ' + settings.operationMode);
+    log(`Settings loaded. OpMode: ${settings.operationMode}, Lang: ${settings.lang}`);
+  });
+
+  // Listen to remote changes (e.g. In-Player HUD in YouTube tab)
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === 'local') {
+      let updated = false;
+      for (const key of SETTING_KEYS) {
+        if (changes[key] && changes[key].newValue !== undefined) {
+          settings[key] = changes[key].newValue;
+          updated = true;
+        }
+      }
+      if (updated) {
+        applyUI();
+      }
+    }
   });
 
   function loadLegacy() {
@@ -71,6 +204,8 @@
   }
 
   function applyUI() {
+    applyLanguage();
+
     for (const [key, sel] of Object.entries(KEYS)) {
       const el = $(sel);
       if (el) el.checked = !!settings[key];
@@ -92,7 +227,7 @@
     const stText = $('#stText');
     const stBadge = $('#stBadge');
     if (!isEnabled) {
-      if (stText) stText.textContent = 'Disabled';
+      if (stText) stText.textContent = t('st_disabled');
       if (stBadge) {
         stBadge.style.background = 'rgba(120, 120, 120, 0.2)';
         stBadge.style.color = '#aaa';
@@ -100,41 +235,37 @@
     }
   }
 
-  function save() {
+  function save(shouldReload = true) {
     if ($('#en')) settings.enabled = $('#en').checked;
     if ($('#ar')) settings.autoReload = $('#ar').checked;
     if ($('#sp')) settings.shadowPlayer = $('#sp').checked;
 
     applyUI();
     chrome.storage.local.set(settings);
-    log(`Settings saved. OpMode: ${settings.operationMode}, StatsOverride: ${settings.shadowPlayer}`);
+    log(`Settings saved. OpMode: ${settings.operationMode}, Lang: ${settings.lang}, StatsOverride: ${settings.shadowPlayer}`);
 
-    // Note: YouTube page must refresh after applying config
-    // Send settings to content script and trigger reload
+    // Send settings to content script and trigger reload if autoReload enabled and shouldReload is true
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       if (!tabs[0]) return;
       const tabId = tabs[0].id;
 
-      // Send settings to content script (inject.js) via messaging
       chrome.scripting.executeScript({
         target: { tabId },
-        func: (s) => {
+        func: (s, reload) => {
           localStorage.setItem('ytss_settings', JSON.stringify(s));
           localStorage.setItem('ytSpoofingStream_settings', JSON.stringify(s));
           if (window.YTSS_SpoofingMethods && typeof window.YTSS_SpoofingMethods.applySettings === 'function') {
-            window.YTSS_SpoofingMethods.applySettings(s);
+            window.YTSS_SpoofingMethods.applySettings(s, reload);
           } else {
             window.postMessage({ type: 'YTSpoofingStream_settingsUpdate', settings: s }, '*');
-          }
-
-          // Force reload YouTube page to apply new config
-          if (s.autoReload && window.location.href.includes('youtube.com')) {
-            window.location.reload();
+            if (reload && s.autoReload && window.location.href.includes('youtube.com')) {
+              window.location.reload();
+            }
           }
         },
-        args: [settings],
+        args: [settings, shouldReload],
       }, () => {
-        if (settings.autoReload && /youtube\.com/.test(tabs[0].url || '')) {
+        if (shouldReload && settings.autoReload && /youtube\.com/.test(tabs[0].url || '')) {
           log('Config applied — reloading YouTube page...');
         }
       });
@@ -142,35 +273,75 @@
   }
 
   // ─── CLIENT OAUTH HANDLERS ─────────────────────────────────────────
+  let refreshAuthStatus = null;
+
   function setupAuthControl(clientKey, statusElId, codeContId, codeElId, loginBtnId, logoutBtnId, labelName) {
+    let lastAuthState = { isAuth: false, error: null, waiting: false };
+
+    function renderStatus() {
+      const statusEl = $(statusElId);
+      const loginBtn = $(loginBtnId);
+      const logoutBtn = $(logoutBtnId);
+      const codeCont = $(codeContId);
+      if (!statusEl || !loginBtn || !logoutBtn || !codeCont) return;
+
+      if (lastAuthState.waiting) {
+        statusEl.textContent = t('tv_status_waiting');
+        statusEl.style.color = 'var(--gold)';
+        return;
+      }
+
+      if (lastAuthState.error) {
+        statusEl.textContent = t('tv_status_error', { error: lastAuthState.error });
+        statusEl.style.color = 'var(--accent)';
+        return;
+      }
+
+      if (lastAuthState.isAuth) {
+        statusEl.textContent = t('tv_status_logged_in', { name: labelName });
+        statusEl.style.color = 'var(--green)';
+        loginBtn.style.display = 'none';
+        logoutBtn.style.display = 'block';
+        codeCont.style.display = 'none';
+      } else {
+        statusEl.textContent = t('tv_status_not_logged_in');
+        statusEl.style.color = 'var(--dim)';
+        loginBtn.style.display = 'block';
+        logoutBtn.style.display = 'none';
+      }
+    }
+
+    refreshAuthStatus = () => {
+      renderStatus();
+    };
+
     function checkAuth() {
       chrome.runtime.sendMessage({ type: 'CHECK_CLIENT_AUTH', client: clientKey }, (res) => {
-        if (res && res.isAuth) {
-          $(statusElId).textContent = `Status: Logged In (${labelName} Authenticated)`;
-          $(statusElId).style.color = 'var(--green)';
-          $(loginBtnId).style.display = 'none';
-          $(logoutBtnId).style.display = 'block';
-          $(codeContId).style.display = 'none';
-        } else {
-          $(statusElId).textContent = `Status: Not Logged In`;
-          $(statusElId).style.color = 'var(--dim)';
-          $(loginBtnId).style.display = 'block';
-          $(logoutBtnId).style.display = 'none';
-        }
+        lastAuthState = {
+          isAuth: !!(res && res.isAuth),
+          error: null,
+          waiting: false,
+        };
+        renderStatus();
       });
     }
 
     $(loginBtnId)?.addEventListener('click', () => {
-      $(loginBtnId).disabled = true;
-      $(loginBtnId).textContent = 'Loading...';
+      const btn = $(loginBtnId);
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = t('tv_loading');
+      }
 
       chrome.runtime.sendMessage({ type: 'START_CLIENT_AUTH', client: clientKey }, (res) => {
-        $(loginBtnId).disabled = false;
-        $(loginBtnId).textContent = `Login to ${labelName}`;
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = t('btn_tv_login');
+        }
         if (res && res.success && res.data) {
           const d = res.data;
-          $(statusElId).textContent = 'Status: Waiting for you to activate...';
-          $(statusElId).style.color = 'var(--gold)';
+          lastAuthState = { isAuth: false, error: null, waiting: true };
+          renderStatus();
 
           $(codeElId).textContent = d.user_code;
           $(codeContId).style.display = 'block';
@@ -185,8 +356,8 @@
             });
           }, 3000);
         } else {
-          $(statusElId).textContent = 'Status: Error - ' + (res?.error || 'Unknown');
-          $(statusElId).style.color = 'var(--accent)';
+          lastAuthState = { isAuth: false, error: res?.error || 'Unknown', waiting: false };
+          renderStatus();
         }
       });
     });
@@ -208,6 +379,17 @@
   for (const sel of Object.values(KEYS)) {
     $(sel)?.addEventListener('change', save);
   }
+
+  // Language switch listeners
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const newLang = btn.dataset.lang;
+      if (settings.lang === newLang) return;
+      settings.lang = newLang;
+      save(false);
+    });
+  });
 
   document.querySelectorAll('.op-mode').forEach(m => {
     m.addEventListener('click', () => {
@@ -254,12 +436,15 @@
         // Status badge
         const badge = $('#stBadge');
         const text = $('#stText');
-        if (d.activeAudioItag) {
+        if (!settings.enabled) {
+          badge?.classList.add('off');
+          if (text) text.textContent = t('st_disabled');
+        } else if (d.activeAudioItag) {
           badge?.classList.remove('off');
-          if (text) text.textContent = 'Active';
+          if (text) text.textContent = t('st_active');
         } else {
           badge?.classList.add('off');
-          if (text) text.textContent = 'Inactive';
+          if (text) text.textContent = t('st_inactive');
         }
 
         // SW status ping
@@ -267,10 +452,10 @@
           const swEl = $('#swSt');
           if (swEl) {
             if (resp && resp.ready) {
-              swEl.textContent = `SW: v${resp.version} Active`;
+              swEl.textContent = t('sw_active', { version: resp.version });
               swEl.style.color = '#00c853';
             } else {
-              swEl.textContent = 'SW: Offline (Reload required)';
+              swEl.textContent = t('sw_offline');
               swEl.style.color = '#e94560';
             }
           }
@@ -290,7 +475,7 @@
 
         if (d.fallbackReason) {
           if (methodEl) {
-            methodEl.textContent = 'FALLBACK TO ORIGINAL';
+            methodEl.textContent = t('method_fallback');
             methodEl.style.color = '#e94560';
           }
           if (audioEl) {
@@ -301,7 +486,7 @@
         } else {
           if (methodEl) {
             methodEl.style.color = 'var(--gold)';
-            methodEl.textContent = d.activeMethod ? `${d.activeMethod} (Active)` : 'Original';
+            methodEl.textContent = d.activeMethod ? `${d.activeMethod} ${t('method_active_suffix')}` : t('method_original');
           }
           if (audioEl) {
             audioEl.style.color = '';
