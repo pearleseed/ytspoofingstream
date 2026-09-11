@@ -574,7 +574,10 @@
             try { if (!descMuted.get.call(this)) descMuted.set.call(this, true); } catch (e) {}
           }
           if (StudioEngine774.audio) {
-            StudioEngine774.syncVolDirect(v);
+            const targetVol = (typeof StudioEngine774.getUserVolume === 'function')
+              ? StudioEngine774.getUserVolume()
+              : v;
+            StudioEngine774.syncVolDirect(targetVol);
           }
         } else {
           try { descVolume.set.call(this, v); } catch (e) {}
@@ -609,6 +612,7 @@
           try { descMuted.set.call(this, m); } catch (e) {}
           return;
         }
+        if (typeof StudioEngine774 !== 'undefined') StudioEngine774._userMuted = !!m;
         if (typeof StudioEngine774 !== 'undefined' && StudioEngine774.isActive && !StudioEngine774.isAdActive()) {
           if (typeof StudioEngine774._silenceElement === 'function') {
             StudioEngine774._silenceElement(this);
@@ -617,11 +621,13 @@
             try { if (!descMuted.get.call(this)) descMuted.set.call(this, true); } catch (e) {}
           }
           if (StudioEngine774.audio) {
-            const reallyMuted = StudioEngine774._userMuted;
+            const reallyMuted = StudioEngine774.isUserMuted();
             if (reallyMuted) {
               StudioEngine774.audio.volume = 0;
             } else {
-              const curVol = (this._userVol !== undefined) ? this._userVol : 1.0;
+              const curVol = (typeof StudioEngine774.getUserVolume === 'function')
+                ? StudioEngine774.getUserVolume()
+                : (this._userVol !== undefined ? this._userVol : 1.0);
               if (curVol > 0) StudioEngine774.syncVolDirect(curVol);
             }
           }
@@ -1067,7 +1073,10 @@
             if (StudioEngine774.isActive && !StudioEngine774.isAdActive()) {
               StudioEngine774._silenceElement(this);
               if (StudioEngine774.audio) {
-                StudioEngine774.syncVolDirect(v);
+                const targetVol = (typeof StudioEngine774.getUserVolume === 'function')
+                  ? StudioEngine774.getUserVolume()
+                  : v;
+                StudioEngine774.syncVolDirect(targetVol);
               }
             } else {
               try { descVolume.set.call(this, v); } catch (e) {}
@@ -1085,13 +1094,17 @@
           },
           set(m) {
             this._userMuted = !!m;
+            StudioEngine774._userMuted = !!m;
             if (StudioEngine774.isActive && !StudioEngine774.isAdActive()) {
               StudioEngine774._silenceElement(this);
               if (StudioEngine774.audio) {
-                if (StudioEngine774._userMuted) {
+                if (StudioEngine774.isUserMuted()) {
                   StudioEngine774.audio.volume = 0;
                 } else {
-                  StudioEngine774.syncVolDirect(this._userVol !== undefined ? this._userVol : 1.0);
+                  const curVol = (typeof StudioEngine774.getUserVolume === 'function')
+                    ? StudioEngine774.getUserVolume()
+                    : (this._userVol !== undefined ? this._userVol : 1.0);
+                  StudioEngine774.syncVolDirect(curVol);
                 }
               }
             } else {
@@ -1196,13 +1209,13 @@
             this.restoreNativeVideo(video);
             return;
           }
-          this._silenceElement(video);
           if (!this._userMuted) {
             const player = document.getElementById('movie_player');
             if (player && typeof player.isMuted === 'function' && player.isMuted()) {
               try { player.unMute(); } catch (e) {}
             }
           }
+          this._silenceElement(video);
           this.syncVol(video);
           this.audio.playbackRate = video.playbackRate;
 
@@ -1383,9 +1396,13 @@
           player.unMute = () => {
             this._userMuted = false;
             const res = origUnmute.call(player);
-            if (this.isActive && !this.isAdActive() && this.audio) {
-              const curVol = (typeof player.getVolume === 'function') ? player.getVolume() : 100;
-              this.syncVolDirect(curVol / 100);
+            if (this.isActive && !this.isAdActive()) {
+              const mainVideo = getMainVideoElement();
+              if (mainVideo) this._silenceElement(mainVideo);
+              if (this.audio) {
+                const curVol = (typeof player.getVolume === 'function') ? player.getVolume() : 100;
+                this.syncVolDirect(curVol / 100);
+              }
             }
             return res;
           };
@@ -1786,7 +1803,6 @@
       this.updateNormalizedGain();
 
       this.hookVideo(mainVideo);
-      this.silenceNativeVideo(mainVideo);
 
       if (!this._userMuted) {
         const player = document.getElementById('movie_player');
@@ -1794,6 +1810,7 @@
           try { player.unMute(); } catch (e) {}
         }
       }
+      this.silenceNativeVideo(mainVideo);
 
       if (this.audio.src !== streamUrl) {
         try {
