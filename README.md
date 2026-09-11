@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="logo.svg" alt="YTSpoofingStream Logo" width="128" height="128">
+  <img src="assets/icons/logo.svg" alt="YTSpoofingStream Logo" width="128" height="128">
   <h1>YTSpoofingStream</h1>
   <p><b>Force 100% Genuine Studio Opus 774 Audio on YouTube via Dual-Stream Synchronization Engine</b></p>
 
@@ -195,6 +195,33 @@ You can install the officially signed package permanently, or run from source:
 - **Auto-reload page on change**: Automatically reloads the YouTube tab when switching settings.
 - **Stats for Nerds Override**: Injects authentic 774 Opus metrics into YouTube's native *Stats for Nerds* overlay.
 - **TVHTML5 Login**: OAuth activation portal for TV Living Room spoofing.
+
+---
+
+## 🧪 Zero-Dependency Strict Test Suite
+
+YTSpoofingStream includes a comprehensive, strict unit and integration test suite built entirely with Node.js built-in `node:test` and `node:assert/strict`. It requires **zero external packages or `node_modules`** to run.
+
+```bash
+# Run all unit and integration tests
+npm test
+# Or directly via Node.js native test runner
+node --test test/**/*.test.js
+
+# Run standalone test runner with formatted output
+node test/run.js
+
+# Verify JS syntax across all extension files
+npm run check
+```
+
+### Test Coverage Highlights:
+- **PLL Micro-Sync**: Validates 35ms broadcast tolerance deadband, 1.5% micro-slew rate adjustment, and hard-seek thresholds.
+- **Protobuf SABR Rewriter**: Validates varint decoding/encoding, tag parsing, and in-place binary SABR ITAG 774 payload rewriting.
+- **Lifecycle & Navigation Resilience**: Validates immediate clock snap upon tab unfreezing (`visibilitychange`), clean track teardown on `yt-navigate-start`, and Shorts loop wrap-around handling.
+- **Failover State Machine**: Validates `HYBRID_HQ` bidirectional switching (`YTM_HARVESTER` <-> `TVHTML5`) and infinite loop prevention.
+- **Stream Sanitizer & Auth**: Validates URL parameter stripping (`range`, `sabr`, `ump`, etc.) and multi-cookie SAPISID hash generation.
+- **Chrome & DOM Mock Engine**: Fully isolated in-memory mocks for Chrome MV3 APIs and HTML5 Media Elements.
 
 ---
 

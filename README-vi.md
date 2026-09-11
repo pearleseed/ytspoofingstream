@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="logo.svg" alt="YTSpoofingStream Logo" width="128" height="128">
+  <img src="assets/icons/logo.svg" alt="YTSpoofingStream Logo" width="128" height="128">
   <h1>YTSpoofingStream</h1>
   <p><b>Kích Hoạt 100% Luồng Âm Thanh Studio Opus 774 Chuẩn Phòng Thu Trên Trình Duyệt YouTube</b></p>
 
@@ -196,6 +196,33 @@ Bạn có thể cài đặt vĩnh viễn bằng gói đã ký số chính thức
 - **Tự động tải lại trang khi đổi cấu hình**: Tự động reload trang YouTube khi thay đổi thiết lập.
 - **Stats for Nerds Override**: Hiển thị thông số codec Opus 774 trong bảng Stats for Nerds của YouTube.
 - **TVHTML5 Login**: Cổng xác thực tài khoản Google cho client Smart TV.
+
+---
+
+## 🧪 Bộ Kiểm thử Nghiêm ngặt (Zero-Dependency Strict Test Suite)
+
+YTSpoofingStream trang bị hệ thống kiểm thử tự động (Unit & Integration Tests) xây dựng 100% bằng các module tích hợp sẵn trong Node.js (`node:test` và `node:assert/strict`). Bộ test này chạy độc lập và **không yêu cầu bất kỳ thư viện ngoài hay thư mục `node_modules` nào**.
+
+```bash
+# Chạy toàn bộ unit test và integration test
+npm test
+# Hoặc chạy trực tiếp bằng test runner gốc của Node.js
+node --test test/**/*.test.js
+
+# Chạy test runner độc lập với giao diện chi tiết
+node test/run.js
+
+# Kiểm tra cú pháp toàn bộ file mã nguồn extension
+npm run check
+```
+
+### Các nhóm tính năng được kiểm thử nghiêm ngặt:
+- **PLL Micro-Sync Engine**: Kiểm tra độ trôi pha trong vùng chết 35ms, vi chỉnh tốc độ 1.5% khi lệch nhẹ 35-350ms, và hard-seek khi lệch lớn.
+- **Protobuf SABR Rewriter**: Kiểm tra parse varint, wire types, và ghi đè nhị phân ITAG 774 trong luồng SABR UMP.
+- **Vòng đời & Khôi phục sự cố**: Kiểm tra bù lệch đồng hồ tức thì khi unfreeze tab (`visibilitychange`), dọn dẹp track sạch sẽ trên `yt-navigate-start`, và tự động loop âm thanh trên YouTube Shorts.
+- **Máy trạng thái Failover**: Kiểm tra chuyển mạch 2 chiều thông minh `HYBRID_HQ` (`YTM_HARVESTER` <-> `TVHTML5`) và chống lặp vô hạn.
+- **Khử tham số URL & Xác thực**: Kiểm tra làm sạch param streaming thừa (`range`, `sabr`, `ump`,...) và tính toán SAPISID hash.
+- **Chrome & DOM Mock Engine**: Môi trường giả lập trong bộ nhớ siêu nhẹ cho Chrome MV3 API và HTML5 Media Elements.
 
 ---
 
