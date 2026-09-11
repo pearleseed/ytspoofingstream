@@ -1,0 +1,21 @@
+{
+  "name": "ytspoofingstream",
+  "version": "0.1.5",
+  "description": "Force 100% genuine Studio Opus 774 on YouTube via Dual-Stream Synchronization Engine",
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/**/*.test.js",
+    "test:unit": "node --test test/unit/**/*.test.js",
+    "test:integration": "node --test test/integration/**/*.test.js",
+    "check": "node -c src/background/background.js src/content/bridge.js src/content/inject.js src/content/ytm_harvester_cs.js src/offscreen/harvester.js src/popup/popup.js"
+  },
+  "keywords": [
+    "youtube",
+    "opus",
+    "774",
+    "audio",
+    "chrome-extension"
+  ],
+  "author": "namle",
+  "license": "MIT"
+}
