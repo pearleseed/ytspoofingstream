@@ -12,14 +12,14 @@
 
   const TAG = '[YTM-Harvester]';
   const urlVid = new URLSearchParams(location.search).get('v');
-  console.log(TAG, `Active inside YTM harvester frame. Target videoId: ${urlVid}, URL: ${location.href}`);
+  console.debug(TAG, `Active inside YTM harvester frame. Target videoId: ${urlVid}, URL: ${location.href}`);
 
   let isAborted = false;
 
   function notifyAbort(reason) {
     if (isAborted) return;
     isAborted = true;
-    console.warn(TAG, `[ABORT] Harvest aborted for ${urlVid}: ${reason}`);
+    console.debug(TAG, `[ABORT] Harvest aborted for ${urlVid}: ${reason}`);
     try {
       window.parent.postMessage({
         type: 'HARVEST_ABORT',
@@ -57,19 +57,19 @@
     }
 
     // No 774 stream available for this video -> Abort harvest and let native audio play
-    console.warn(TAG, `Video ${urlVid} has NO ITAG 774 stream. Aborting harvest.`);
+    console.debug(TAG, `Video ${urlVid} has NO ITAG 774 stream. Aborting harvest.`);
     notifyAbort('NO_774_STREAM');
     json.streamingData = null;
     return json;
   }
 
   function validatePlayerResponse(json) {
-    if (!json) return false;
+    if (isAborted || !json) return false;
     const videoId = json.videoDetails?.videoId;
 
     if (json.playabilityStatus?.status && json.playabilityStatus.status !== 'OK') {
       const reason = json.playabilityStatus.reason || json.playabilityStatus.status;
-      console.warn(TAG, `Track ${urlVid} is UNPLAYABLE on YTM (${reason}). Cancelling.`);
+      console.debug(TAG, `Track ${urlVid} is UNPLAYABLE on YTM (${reason}). Cancelling.`);
       notifyAbort(`UNPLAYABLE: ${reason}`);
       return false;
     }
@@ -77,7 +77,7 @@
     // STRICT CHECK: Verify videoId matches urlVid EXACTLY.
     // YouTube Music auto-skips to similar tracks on unavailable videos. We must BLOCK this!
     if (videoId && urlVid && videoId !== urlVid) {
-      console.warn(TAG, `YTM attempted to substitute ${urlVid} with different track ${videoId}! BLOCKING.`);
+      console.debug(TAG, `YTM attempted to substitute ${urlVid} with different track ${videoId}! BLOCKING.`);
       notifyAbort(`TRACK_MISMATCH: YTM skipped to ${videoId}`);
       return false;
     }
@@ -98,7 +98,7 @@
       if (vid && urlVid && vid !== urlVid) {
         // Stale initial hydration data (YTM template). Neutralize streamingData without aborting,
         // so YTM can proceed to fetch the actual target video (urlVid).
-        console.log(TAG, `Ignoring stale hydration track ${vid} (waiting for ${urlVid})`);
+        console.debug(TAG, `Ignoring stale hydration track ${vid} (waiting for ${urlVid})`);
         if (v.streamingData) v.streamingData = null;
         initial = v;
         return;
@@ -164,7 +164,7 @@
       const u = new URL(streamUrl);
       const docid = u.searchParams.get('docid');
       if (docid && urlVid && docid !== urlVid) {
-        console.warn(TAG, `Ignored ITAG 774 stream for mismatched track docid=${docid} (expected ${urlVid})`);
+        console.debug(TAG, `Ignored ITAG 774 stream for mismatched track docid=${docid} (expected ${urlVid})`);
         return;
       }
     } catch (e) {}

@@ -35,7 +35,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.type === 'OFFSCREEN_HARVEST_YTM') {
     const { videoId } = msg;
     const iframe = createFrame();
-    console.log(TAG, `Loading clean YTM harvest session for ${videoId}...`);
+    console.debug(TAG, `Loading clean YTM harvest session for ${videoId}...`);
     iframe.src = `https://music.youtube.com/watch?v=${videoId}`;
     sendResponse({ success: true });
     return true;
@@ -60,7 +60,7 @@ window.addEventListener('message', (e) => {
   }
 
   if (e.data?.type === 'HARVEST_ABORT') {
-    console.warn(TAG, `Iframe reported abort for ${e.data.videoId}: ${e.data.reason}`);
+    console.debug(TAG, `Iframe reported abort for ${e.data.videoId}: ${e.data.reason}`);
     teardownFrame();
     chrome.runtime.sendMessage({
       type: 'OFFSCREEN_HARVEST_ABORT',
@@ -71,4 +71,4 @@ window.addEventListener('message', (e) => {
   }
 });
 
-console.log(TAG, 'Offscreen Harvester initialized with strict DOM teardown.');
+console.debug(TAG, 'Offscreen Harvester initialized with strict DOM teardown.');

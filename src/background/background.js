@@ -853,7 +853,7 @@ const pendingHarvests = new Map(); // videoId -> Promise
 
 async function harvestViaYtm(videoId, title = null, author = null) {
   if (pendingHarvests.has(videoId)) {
-    console.log(TAG, `[YTM_HARVEST] Joining existing harvest session for ${videoId}`);
+    console.debug(TAG, `[YTM_HARVEST] Joining existing harvest session for ${videoId}`);
     return pendingHarvests.get(videoId);
   }
 
@@ -862,7 +862,7 @@ async function harvestViaYtm(videoId, title = null, author = null) {
   // Drop any obsolete pending harvests for different videos
   for (const [vId, p] of pendingHarvests.entries()) {
     if (vId !== videoId) {
-      console.log(TAG, `[YTM_HARVEST] Dropping obsolete pending harvest for ${vId}`);
+      console.debug(TAG, `[YTM_HARVEST] Dropping obsolete pending harvest for ${vId}`);
       pendingHarvests.delete(vId);
     }
   }
@@ -887,7 +887,7 @@ async function _doHarvest(videoId, title = null, author = null) {
 
   // Immediately abort any previous in-flight harvest for an older video
   if (activeHarvestSession) {
-    console.log(TAG, `[YTM_HARVEST] Aborting existing harvest for ${activeHarvestSession.videoId} (new target: ${videoId})`);
+    console.debug(TAG, `[YTM_HARVEST] Aborting existing harvest for ${activeHarvestSession.videoId} (new target: ${videoId})`);
     activeHarvestSession.cancelled = true;
     try { activeHarvestSession.resolve([]); } catch (e) {}
     clearTimeout(activeHarvestSession.timer);
@@ -902,7 +902,7 @@ async function _doHarvest(videoId, title = null, author = null) {
     const timer = setTimeout(() => {
       if (activeHarvestSession && activeHarvestSession.sessionId === sessionId) {
         activeHarvestSession = null;
-        console.log(TAG, `[YTM_HARVEST] Timeout for ${videoId} (session #${sessionId}), falling back to native`);
+        console.debug(TAG, `[YTM_HARVEST] Timeout for ${videoId} (session #${sessionId}), falling back to native`);
         chrome.runtime.sendMessage({ type: 'OFFSCREEN_STOP_HARVEST' }).catch(() => {});
         resolve([]);
       }
@@ -957,7 +957,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
   if (msg.type === 'OFFSCREEN_HARVEST_ABORT') {
     if (activeHarvestSession && activeHarvestSession.videoId === msg.videoId) {
-      console.log(TAG, `[YTM_HARVEST] Harvest aborted for ${msg.videoId}: ${msg.reason}`);
+      console.debug(TAG, `[YTM_HARVEST] Harvest aborted for ${msg.videoId}: ${msg.reason}`);
       const resolve = activeHarvestSession.resolve;
       activeHarvestSession = null;
       chrome.runtime.sendMessage({ type: 'OFFSCREEN_STOP_HARVEST' }).catch(() => {});
