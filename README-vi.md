@@ -4,14 +4,10 @@
   <p><b>Kích Hoạt 100% Luồng Âm Thanh Studio Opus 774 Chuẩn Phòng Thu Trên Trình Duyệt YouTube</b></p>
 
   <p>
-    <a href="https://github.com/alithw/YTSpoofingStream/releases"><img src="https://img.shields.io/badge/release-v0.1.6-blue.svg?style=flat-square" alt="Phiên bản Mới nhất"></a>
+    <a href="https://github.com/pearleseed/ytspoofingstream/releases"><img src="https://img.shields.io/badge/release-v0.1.6-blue.svg?style=flat-square" alt="Phiên bản Mới nhất"></a>
     <img src="https://img.shields.io/badge/manifest-v3-green.svg?style=flat-square" alt="Manifest V3">
-    <img src="https://img.shields.io/badge/license-MIT-orange.svg?style=flat-square" alt="Giấy phép MIT">
     <img src="https://img.shields.io/badge/platform-Chrome%20%7C%20Edge%20%7C%20Brave-lightgrey?style=flat-square" alt="Nền tảng hỗ trợ">
-    <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" alt="Đóng góp vào dự án"></a>
-    <a href="CODE_OF_CONDUCT.md"><img src="https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg?style=flat-square" alt="Quy tắc ứng xử"></a>
     <a href="SECURITY.md"><img src="https://img.shields.io/badge/security-policy-blueviolet.svg?style=flat-square" alt="Chính sách bảo mật"></a>
-    <a href="https://ko-fi.com/alithw"><img src="https://img.shields.io/badge/Ko--fi-Buy%20me%20a%20coffee-ff5e5b?style=flat-square&logo=ko-fi&logoColor=white" alt="Ko-fi"></a>
   </p>
 </div>
 
@@ -29,7 +25,7 @@
 > [!TIP]
 > **Bạn đang sử dụng Mozilla Firefox / Firefox ESR?**  
 > Nhánh này (`main`) được cấu hình dành riêng cho **các trình duyệt nhân Chromium** (Google Chrome, Brave, Microsoft Edge, Opera).  
-> Nếu bạn sử dụng **Mozilla Firefox**, vui lòng chuyển sang nhánh [**`firefox`**](https://github.com/alithw/YTSpoofingStream/tree/firefox) hoặc tải trực tiếp gói cài đặt đã ký số [**`YTSS-0.1.6.xpi`**](https://github.com/alithw/YTSpoofingStream/raw/firefox/YTSS-0.1.6.xpi) để cài đặt vĩnh viễn!
+> Nếu bạn sử dụng **Mozilla Firefox**, vui lòng chuyển sang nhánh [**`firefox`**](https://github.com/pearleseed/ytspoofingstream/tree/firefox) hoặc tải trực tiếp gói cài đặt đã ký số [**`YTSS-0.1.6.xpi`**](https://github.com/pearleseed/ytspoofingstream/raw/firefox/YTSS-0.1.6.xpi) để cài đặt vĩnh viễn!
 
 *Đọc bằng ngôn ngữ khác: [English](README.md).*
 
@@ -49,10 +45,6 @@
 - [🚀 Hướng dẫn Cài đặt](#-hướng-dẫn-cài-đặt)
 - [⚙️ Cấu hình & Điều khiển](#️-cấu-hình--điều-khiển)
 - [🐞 Xử lý Sự cố & Câu hỏi Thường gặp](#-xử-lý-sự-cố--câu-hỏi-thường-gặp)
-- [💖 Ủng hộ Dự án (Buy Me a Coffee)](#-ủng-hộ-dự-án-buy-me-a-coffee)
-- [🤝 Đóng góp & Cộng đồng (Contributing)](#-đóng-góp--cộng-đồng-contributing)
-- [⚠️ Tuyên bố Từ chối Trách nhiệm (Disclaimer)](#️-tuyên-bố-từ-chối-trách-nhiệm-disclaimer)
-- [📄 Giấy phép (License)](#-giấy-phép-license)
 
 ---
 
@@ -167,7 +159,7 @@ Kết quả kiểm thử thực tế thời gian thực 100% thời lượng tr�
 ### Trình duyệt Chromium (Google Chrome, Brave, Edge, Cốc Cốc, Opera)
 1. Tải mã nguồn về máy tính (nhánh `main`):
    ```bash
-   git clone https://github.com/alithw/YTSpoofingStream.git
+   git clone https://github.com/pearleseed/ytspoofingstream.git
    ```
 2. Mở trình duyệt Chrome và truy cập `chrome://extensions/`.
 3. Bật **Chế độ dành cho nhà phát triển (Developer mode)** ở góc trên bên phải.
@@ -178,7 +170,7 @@ Kết quả kiểm thử thực tế thời gian thực 100% thời lượng tr�
 Bạn có thể cài đặt vĩnh viễn bằng gói đã ký số chính thức hoặc nạp từ mã nguồn:
 
 - **Cài đặt nhanh (Gói XPI đã ký số chính thức bởi Mozilla)**:
-  Tải file cài đặt [**`YTSS-0.1.3.xpi`**](https://github.com/alithw/YTSpoofingStream/raw/firefox/YTSS-0.1.3.xpi) từ nhánh [`firefox`](https://github.com/alithw/YTSpoofingStream/tree/firefox), kéo thả trực tiếp vào cửa sổ Firefox (hoặc nhấn `Ctrl + O` để mở file), sau đó bấm **Thêm (Add)** để cài đặt vĩnh viễn (không bao giờ bị mất khi khởi động lại).
+  Tải file cài đặt [**`YTSS-0.1.3.xpi`**](https://github.com/pearleseed/ytspoofingstream/raw/firefox/YTSS-0.1.3.xpi) từ nhánh [`firefox`](https://github.com/pearleseed/ytspoofingstream/tree/firefox), kéo thả trực tiếp vào cửa sổ Firefox (hoặc nhấn `Ctrl + O` để mở file), sau đó bấm **Thêm (Add)** để cài đặt vĩnh viễn (không bao giờ bị mất khi khởi động lại).
 - **Chạy từ mã nguồn (Tiện ích tạm thời)**:
   1. Chuyển sang nhánh `firefox`:
      ```bash
@@ -237,42 +229,3 @@ npm run check
 - **Lý do**: YTSpoofingStream can thiệp sâu vào tầng mạng (DNR rules, cookie routing, header spoofing) để trích xuất luồng cho YouTube máy tính, việc này có thể gây xung đột với Service Worker và hàng đợi phát nhạc của trang web `music.youtube.com`.  
 - **Lưu ý quan trọng**: Bản thân **YouTube Music Web (`music.youtube.com`) chỉ hỗ trợ luồng AAC 141 (~256kbps)** và **không hỗ trợ luồng Opus 774** trên trình duyệt máy tính. Nếu bạn muốn thưởng thức âm thanh **Opus 774** chuẩn phòng thu đỉnh cao nhất, hãy nghe nhạc trực tiếp trên **YouTube thường (`www.youtube.com`)** với YTSpoofingStream đang bật!
 
----
-
-## 💖 Ủng hộ Dự án (Buy Me a Coffee)
-
-Nếu **YTSpoofingStream** mang lại trải nghiệm nghe nhạc tuyệt vời hơn cho bạn trên YouTube, bạn có thể ủng hộ tác giả một ly cà phê để tiếp thêm động lực nghiên cứu và cập nhật tiện ích:
-
-<p align="center">
-  <a href="https://ko-fi.com/alithw" target="_blank">
-    <img src="https://storage.ko-fi.com/cdn/kofi3.png?v=3" height="40" alt="Buy Me a Coffee at ko-fi.com" />
-  </a>
-</p>
-
-Bạn có thể ủng hộ dự án qua **[Ko-fi (ko-fi.com/alithw)](https://ko-fi.com/alithw)**. Mọi sự ủng hộ và đồng hành của bạn đều là nguồn động lực rất lớn! ☕✨
-
----
-
-## 🤝 Đóng góp & Cộng đồng (Contributing)
-
-Dự án luôn hoan nghênh mọi sự đóng góp từ cộng đồng! Dù bạn muốn báo lỗi, đóng góp ý tưởng khai thác luồng hay tối ưu hóa mã nguồn, vui lòng tham khảo các tài liệu chỉ dẫn:
-
-- 📘 **[Cẩm nang Đóng góp (CONTRIBUTING.md)](CONTRIBUTING.md)**: Hướng dẫn cài đặt môi trường lập trình, cấu trúc thư mục dự án, tiêu chuẩn code vanilla ES6+ và checklist kiểm tra trước khi gửi PR.
-- 📜 **[Quy tắc Ứng xử (CODE_OF_CONDUCT.md)](CODE_OF_CONDUCT.md)**: Tiêu chuẩn ứng xử văn minh, tôn trọng và hỗ trợ lẫn nhau trong cộng đồng theo chuẩn Contributor Covenant 2.1.
-- 🔒 **[Chính sách Bảo mật (SECURITY.md)](SECURITY.md)**: Quy trình báo cáo lỗ hổng bảo mật có trách nhiệm.
-- 🐛 **[Báo cáo Sự cố (Bug Report)](https://github.com/alithw/YTSpoofingStream/issues/new?template=bug_report.yml)**: Mẫu báo cáo lỗi chi tiết kèm URL video và log console.
-- 💡 **[Đề xuất Tính năng (Feature Request)](https://github.com/alithw/YTSpoofingStream/issues/new?template=feature_request.yml)**: Nơi chia sẻ ý tưởng cải tiến thuật toán và chất lượng âm thanh.
-
----
-
-## ⚠️ Tuyên bố Từ chối Trách nhiệm (Disclaimer)
-
-- **Dự án Độc lập**: YTSpoofingStream là một dự án mã nguồn mở độc lập và **không** có bất kỳ liên kết, ủy quyền, chứng thực hay liên hệ chính thức nào với YouTube, Google LLC hay Alphabet Inc. Trang web chính thức của YouTube tại [https://www.youtube.com](https://www.youtube.com). "YouTube" và "YouTube Music" là các nhãn hiệu đã được đăng ký của Google LLC.
-- **Không Phá khóa DRM**: Tiện ích mở rộng này **hoàn toàn không** bẻ khóa DRM Widevine, không can thiệp nội dung bản quyền được mã hóa và không hỗ trợ tải lậu video/nhạc. Tiện ích chỉ hoạt động trong phạm vi phiên duyệt web hợp lệ của người dùng nhằm định tuyến các luồng phát đã được cấp phép.
-- **Mục đích Nghiên cứu & Cá nhân**: Phần mềm được phát triển phục vụ mục đích nghiên cứu học thuật và trải nghiệm cá nhân. Người dùng tự chịu trách nhiệm khi sử dụng tiện ích theo Điều khoản Dịch vụ của YouTube. Phần mềm được cung cấp dưới dạng "nguyên trạng" (as-is) và không đi kèm bất kỳ cam kết hay bảo đảm nào.
-
----
-
-## 📄 Giấy phép (License)
-
-Dự án được phân phối dưới **Giấy phép MIT (MIT License)**. Xem chi tiết tại file [`LICENSE`](LICENSE).

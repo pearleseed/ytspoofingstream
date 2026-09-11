@@ -27,7 +27,7 @@ YTSpoofingStream operates under strict security and privacy standards:
 If you discover a potential security vulnerability in YTSpoofingStream, please report it responsibly rather than opening a public issue.
 
 ### Preferred Method
-Please report security vulnerabilities confidentially through **[GitHub Private Vulnerability Reporting](https://github.com/alithw/YTSpoofingStream/security/advisories/new)**. This ensures that sensitive details are shared directly with the project maintainer in an encrypted, private channel without exposing personal contact details.
+Please report security vulnerabilities confidentially through **[GitHub Private Vulnerability Reporting](https://github.com/pearleseed/ytspoofingstream/security/advisories/new)**. This ensures that sensitive details are shared directly with the project maintainer in an encrypted, private channel without exposing personal contact details.
 
 ### What to Include
 Please provide as much information as possible to help us reproduce and address the issue:

@@ -4,14 +4,10 @@
   <p><b>Force 100% Genuine Studio Opus 774 Audio on YouTube via Dual-Stream Synchronization Engine</b></p>
 
   <p>
-    <a href="https://github.com/alithw/YTSpoofingStream/releases"><img src="https://img.shields.io/badge/release-v0.1.6-blue.svg?style=flat-square" alt="Latest Release"></a>
+    <a href="https://github.com/pearleseed/ytspoofingstream/releases"><img src="https://img.shields.io/badge/release-v0.1.6-blue.svg?style=flat-square" alt="Latest Release"></a>
     <img src="https://img.shields.io/badge/manifest-v3-green.svg?style=flat-square" alt="Manifest V3">
-    <img src="https://img.shields.io/badge/license-MIT-orange.svg?style=flat-square" alt="License MIT">
     <img src="https://img.shields.io/badge/platform-Chrome%20%7C%20Edge%20%7C%20Brave-lightgrey?style=flat-square" alt="Platforms">
-    <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" alt="PRs Welcome"></a>
-    <a href="CODE_OF_CONDUCT.md"><img src="https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg?style=flat-square" alt="Code of Conduct"></a>
     <a href="SECURITY.md"><img src="https://img.shields.io/badge/security-policy-blueviolet.svg?style=flat-square" alt="Security Policy"></a>
-    <a href="https://ko-fi.com/alithw"><img src="https://img.shields.io/badge/Ko--fi-Buy%20me%20a%20coffee-ff5e5b?style=flat-square&logo=ko-fi&logoColor=white" alt="Ko-fi"></a>
   </p>
 </div>
 
@@ -29,7 +25,7 @@
 > [!TIP]
 > **Using Mozilla Firefox / Firefox ESR?**  
 > This branch (`main`) is configured specifically for **Chromium-based browsers** (Google Chrome, Brave, Microsoft Edge, Opera).  
-> If you are using **Mozilla Firefox**, please switch to the [**`firefox`**](https://github.com/alithw/YTSpoofingStream/tree/firefox) branch or download the pre-signed [**`YTSS-0.1.6.xpi`**](https://github.com/alithw/YTSpoofingStream/raw/firefox/YTSS-0.1.6.xpi) package for instant permanent installation!
+> If you are using **Mozilla Firefox**, please switch to the [**`firefox`**](https://github.com/pearleseed/ytspoofingstream/tree/firefox) branch or download the pre-signed [**`YTSS-0.1.6.xpi`**](https://github.com/pearleseed/ytspoofingstream/raw/firefox/YTSS-0.1.6.xpi) package for instant permanent installation!
 
 *Read this in other languages: [Tiếng Việt](README-vi.md).*
 
@@ -49,10 +45,6 @@
 - [🚀 Installation](#-installation)
 - [⚙️ Configuration & Controls](#️-configuration--controls)
 - [🐞 Troubleshooting & FAQ](#-troubleshooting--faq)
-- [💖 Support / Buy Me a Coffee](#-support--buy-me-a-coffee)
-- [🤝 Contributing & Community](#-contributing--community)
-- [⚠️ Disclaimer](#️-disclaimer)
-- [📄 License](#-license)
 
 ---
 
@@ -167,7 +159,7 @@ Comprehensive 1x real-time full-duration tests across 4 diverse benchmark tracks
 ### Chromium Browsers (Google Chrome, Brave, Edge, Opera)
 1. Clone or download the repository (`main` branch):
    ```bash
-   git clone https://github.com/alithw/YTSpoofingStream.git
+   git clone https://github.com/pearleseed/ytspoofingstream.git
    ```
 2. Open `chrome://extensions/` and toggle on **Developer mode** in the top-right corner.
 3. Click **Load unpacked** and select the `YTSpoofingStream` folder.
@@ -177,7 +169,7 @@ Comprehensive 1x real-time full-duration tests across 4 diverse benchmark tracks
 You can install the officially signed package permanently, or run from source:
 
 - **Quick Install (Signed Package)**:
-  Download the signed [**`YTSS-0.1.3.xpi`**](https://github.com/alithw/YTSpoofingStream/raw/firefox/YTSS-0.1.3.xpi) package from the [`firefox`](https://github.com/alithw/YTSpoofingStream/tree/firefox) branch, drag and drop it into Firefox (or open it via `Ctrl+O`), and click **Add** to install it permanently.
+  Download the signed [**`YTSS-0.1.3.xpi`**](https://github.com/pearleseed/ytspoofingstream/raw/firefox/YTSS-0.1.3.xpi) package from the [`firefox`](https://github.com/pearleseed/ytspoofingstream/tree/firefox) branch, drag and drop it into Firefox (or open it via `Ctrl+O`), and click **Add** to install it permanently.
 - **Run from Source (Temporary Add-on)**:
   1. Switch to the `firefox` branch:
      ```bash
@@ -236,42 +228,3 @@ A: **Yes, you must turn off this extension when using YouTube Music (`music.yout
 - **Reason**: YTSpoofingStream uses deep network routing (DNR rules, cookie routing, header spoofing) to harvest streams for standard YouTube, which can conflict with the Service Worker and playback queue of `music.youtube.com`.  
 - **Key Technical Note**: The **YouTube Music Web client (`music.youtube.com`) only supports AAC 141 (~256kbps)** and **does not serve Opus 774** in desktop browsers. If you want to experience authentic **Opus 774** studio audio, simply enjoy music directly on **standard YouTube (`www.youtube.com`)** with YTSpoofingStream enabled!
 
----
-
-## 💖 Support / Buy Me a Coffee
-
-If **YTSpoofingStream** enhances your music listening experience on YouTube, consider supporting its active development and maintenance:
-
-<p align="center">
-  <a href="https://ko-fi.com/alithw" target="_blank">
-    <img src="https://storage.ko-fi.com/cdn/kofi3.png?v=3" height="40" alt="Buy Me a Coffee at ko-fi.com" />
-  </a>
-</p>
-
-You can support the project on **[Ko-fi (ko-fi.com/alithw)](https://ko-fi.com/alithw)**. Every coffee helps keep the engine updated against YouTube's frequent backend changes! ☕✨
-
----
-
-## 🤝 Contributing & Community
-
-Contributions of all kinds are welcome! Whether you are reporting a bug, proposing new stream extraction strategies, or submitting code improvements, please read our community guidelines:
-
-- 📘 **[Contributing Guide (CONTRIBUTING.md)](CONTRIBUTING.md)**: Local development setup, codebase architecture map, vanilla ES6+ coding standards, and PR submission checklist.
-- 📜 **[Code of Conduct (CODE_OF_CONDUCT.md)](CODE_OF_CONDUCT.md)**: Our standards for a welcoming, constructive, and harassment-free community (Contributor Covenant 2.1).
-- 🔒 **[Security Policy (SECURITY.md)](SECURITY.md)**: Guidelines for responsibly disclosing vulnerabilities.
-- 🐛 **[Report a Bug](https://github.com/alithw/YTSpoofingStream/issues/new?template=bug_report.yml)**: Use our structured issue form with video details and player console logs.
-- 💡 **[Request a Feature](https://github.com/alithw/YTSpoofingStream/issues/new?template=feature_request.yml)**: Share ideas to enhance audio streaming and client compatibility.
-
----
-
-## ⚠️ Disclaimer
-
-- **Independent Project**: YTSpoofingStream is an independent, open-source project and is **not** affiliated, associated, authorized, endorsed by, or in any way officially connected with YouTube, Google LLC, or Alphabet Inc. The official YouTube website can be found at [https://www.youtube.com](https://www.youtube.com). "YouTube" and "YouTube Music" are registered trademarks of Google LLC.
-- **No DRM Circumvention**: This extension does **not** bypass Widevine DRM, crack protected content, or provide unauthorized downloads/piracy. It strictly functions within legitimate, authenticated browser sessions to route streams already authorized for the user.
-- **Educational & Personal Use**: This software is provided for educational and personal research purposes only. Use of this software is at your own discretion and responsibility in compliance with YouTube's Terms of Service. The software is provided "as is", without warranty of any kind.
-
----
-
-## 📄 License
-
-Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for complete details.
