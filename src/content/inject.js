@@ -1244,13 +1244,44 @@
           }
         } else if (e.type === 'ended') {
           this.audio.pause();
+        } else if (e.type === 'timeupdate') {
+          if (location.pathname.includes('/shorts/')) {
+            if (video.currentTime < 0.25 && (this._lastVideoTime || 0) > 5.0) {
+              console.log(TAG, '[Shorts] Loop detected, wrapping 774 audio to beginning...');
+              if (this.audio) {
+                this.audio.currentTime = 0;
+              }
+            }
+            this._lastVideoTime = video.currentTime;
+          }
         }
       };
 
       const captureOpts = { capture: true, passive: true };
-      ['play', 'playing', 'pause', 'waiting', 'seeking', 'seeked', 'ratechange', 'volumechange', 'loadedmetadata', 'canplay', 'ended'].forEach(evt => {
+      ['play', 'playing', 'pause', 'waiting', 'seeking', 'seeked', 'ratechange', 'volumechange', 'loadedmetadata', 'canplay', 'ended', 'timeupdate'].forEach(evt => {
         document.addEventListener(evt, onVideoEvent, captureOpts);
       });
+
+      // Page Lifecycle & Tab Unfreezing Resilience
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+          this.onVisibilityResume();
+        }
+      }, { passive: true });
+
+      window.addEventListener('pageshow', () => {
+        this.onVisibilityResume();
+      }, { passive: true });
+
+      document.addEventListener('resume', () => {
+        this.onVisibilityResume();
+      }, { passive: true });
+
+      // Clean teardown on YouTube SPA navigation
+      window.addEventListener('yt-navigate-start', () => {
+        console.log(TAG, '[NavigationLifecycle] yt-navigate-start detected, resetting playback state...');
+        this.resetForNewTrack();
+      }, { passive: true });
     },
 
     hookVideo(video) {
@@ -1848,7 +1879,12 @@
       return this.applyToVideo(mainVideo, videoId, best774);
     },
 
-    stopAndUnmute(reason = '') {
+    resetForNewTrack(newVideoId = null) {
+      if (this._waiterTimer) {
+        clearInterval(this._waiterTimer);
+        this._waiterTimer = null;
+      }
+      this.stopWatchdog();
       this.isActive = false;
       this.activeVideoId = null;
       this.best774Candidate = null;
@@ -1857,16 +1893,41 @@
       this._isAudioBuffering = false;
       this._userPaused = false;
       this._hasDispatchedEnded = false;
-      this.stopWatchdog();
-      if (this._waiterTimer) {
-        clearInterval(this._waiterTimer);
-        this._waiterTimer = null;
-      }
+
       if (this.audio) {
-        this.audio.pause();
-        this.audio.removeAttribute('src');
-        this.audio.load();
+        try {
+          this.audio.pause();
+          this.audio.removeAttribute('src');
+          this.audio.src = '';
+          this.audio.load();
+        } catch (e) {}
       }
+    },
+
+    onVisibilityResume() {
+      if (!this.isActive || !this.audio || this.isAdActive()) return;
+      const video = getMainVideoElement();
+      if (!video) return;
+
+      console.log(TAG, '[StudioEngine774] Tab unfreezing/resuming. Executing immediate phase realign...');
+      this._silenceElement(video);
+      this.syncVol(video);
+      this.audio.playbackRate = video.playbackRate;
+
+      const drift = Math.abs(this.audio.currentTime - video.currentTime);
+      if (drift > 0.150 && !video.seeking) {
+        this.audio.currentTime = video.currentTime;
+      }
+
+      if (!video.paused && this.audio.paused) {
+        this.audio.play().catch(() => {});
+      } else if (video.paused && !this.audio.paused) {
+        this.audio.pause();
+      }
+    },
+
+    stopAndUnmute(reason = '') {
+      this.resetForNewTrack();
       const mainVideo = getMainVideoElement();
       if (mainVideo) {
         this.restoreNativeVideo(mainVideo);
