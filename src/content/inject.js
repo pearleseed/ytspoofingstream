@@ -1684,16 +1684,40 @@
         this.audio.play().catch(() => {});
       }
 
-      // 3. Keep playbackRate strictly identical without speed tampering
+      // 3. Phase-Locked Loop (PLL) Micro-Rate Drift Controller
       const userRate = video.playbackRate || 1.0;
-      if (this.audio.playbackRate !== userRate) {
-        this.audio.playbackRate = userRate;
-      }
+      const SYNC_DEADBAND_S = 0.035; // 35ms broadcast lip-sync tolerance
+      const SLEW_MAX_S = 0.350;      // 350ms micro-slew range
+      const SLEW_RATE_DELTA = 0.015; // 1.5% inaudible pitch adjustment
 
-      // 4. Video is the MASTER CLOCK. Align audio clock only on genuine large drift (> 1.5s)
-      const absDiff = Math.abs(aTime - vTime);
-      if (absDiff > 1.5 && !video.seeking && !this._isVolScrubbing && !this._isAudioBuffering) {
-        this.audio.currentTime = vTime;
+      const drift = aTime - vTime;
+      const absDiff = Math.abs(drift);
+
+      if (video.seeking || absDiff > SLEW_MAX_S) {
+        // Hard-seek alignment for user scrub or large drift
+        if (!this._isVolScrubbing && !this._isAudioBuffering) {
+          this.audio.currentTime = vTime;
+          if (this.audio.playbackRate !== userRate) {
+            this.audio.playbackRate = userRate;
+          }
+        }
+      } else if (absDiff <= SYNC_DEADBAND_S) {
+        // Locked in phase: match exact video speed
+        if (this.audio.playbackRate !== userRate) {
+          this.audio.playbackRate = userRate;
+        }
+      } else if (drift > SYNC_DEADBAND_S) {
+        // Audio leading video: micro-slew slow down by 1.5%
+        const targetRate = +(userRate * (1 - SLEW_RATE_DELTA)).toFixed(4);
+        if (this.audio.playbackRate !== targetRate) {
+          this.audio.playbackRate = targetRate;
+        }
+      } else {
+        // Audio lagging behind video: micro-slew speed up by 1.5%
+        const targetRate = +(userRate * (1 + SLEW_RATE_DELTA)).toFixed(4);
+        if (this.audio.playbackRate !== targetRate) {
+          this.audio.playbackRate = targetRate;
+        }
       }
     },
 
