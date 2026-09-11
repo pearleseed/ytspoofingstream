@@ -26,11 +26,55 @@
   </div>
 
   <!-- MASTER ENABLE / DISABLE SECTION -->
-  <div class="sec" style="border: 1px solid rgba(233, 69, 96, 0.3); background: rgba(233, 69, 96, 0.08);">
+  <div class="sec master-sec">
     <label class="row" for="en" style="cursor: pointer; margin: 0;">
       <span id="lblEnable" style="font-weight: 700; font-size: 13px; color: #fff;" data-i18n="enable_ext">Kích hoạt Extension</span>
       <span class="tog"><input type="checkbox" id="en" checked><span class="sl"></span></span>
     </label>
+  </div>
+
+  <!-- LIVE STATUS MONITOR SECTION (TOP PROMINENCE) -->
+  <div class="sec status-card" id="statusSec">
+    <div class="status-top-row">
+      <div class="sec-title" data-i18n="sec_status" style="margin-bottom: 0;">Trạng thái</div>
+      <div class="status-indicators">
+        <span class="st-badge" id="stBadge"><span class="st-dot"></span><span id="stText" data-i18n="st_active">Hoạt động</span></span>
+        <span class="sw-pill" id="swSt">SW: —</span>
+      </div>
+    </div>
+
+    <!-- HERO AUDIO STREAM DISPLAY -->
+    <div class="hero-audio-card" id="heroAudioCard">
+      <div class="hero-audio-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2v20M17 5v14M7 8v8M22 10v4M2 10v4"/>
+        </svg>
+      </div>
+      <div class="hero-audio-details">
+        <div class="hero-audio-label" data-i18n="audio_hero_title">Chất lượng âm thanh hiện tại</div>
+        <div class="hero-audio-val" id="iAudio">—</div>
+        <div class="hero-audio-sub">
+          <span class="method-tag" id="iMethod">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUICK METRICS PILLS -->
+    <div class="quick-stats">
+      <div class="stat-pill">
+        <span class="stat-pill-lbl" data-i18n="info_mode">Chế độ</span>
+        <span class="stat-pill-val" id="iMode">HYBRID_HQ (774 ★)</span>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-pill-lbl" data-i18n="info_streams">Luồng phát</span>
+        <span class="stat-pill-val" id="iStreams">0</span>
+      </div>
+    </div>
+
+    <!-- CLIENT HARVESTER MATRIX -->
+    <div class="grid" id="statsGrid">
+      <!-- Generated dynamically in popup.js -->
+    </div>
   </div>
 
   <div id="mainContentWrapper">
@@ -84,23 +128,6 @@
       </label>
     </div>
 
-    <!-- STATUS -->
-    <div class="sec">
-      <div class="sec-title" data-i18n="sec_status">Trạng thái</div>
-      <div class="row">
-        <span class="st-badge" id="stBadge"><span class="st-dot"></span><span id="stText" data-i18n="st_active">Hoạt động</span></span>
-        <span style="font-size:10px;color:var(--dim)" id="swSt">SW: —</span>
-      </div>
-      <div class="info"><span class="l" data-i18n="info_mode">Chế độ</span><span class="v" id="iMode" style="color:var(--gold);font-weight:700;">HYBRID_HQ (774)</span></div>
-      <div class="info"><span class="l" data-i18n="info_method">Phương thức hoạt động</span><span class="v" id="iMethod" style="color:var(--gold);font-weight:700;">—</span></div>
-      <div class="info"><span class="l" data-i18n="info_streams">Luồng phát</span><span class="v" id="iStreams">0</span></div>
-      <div class="info"><span class="l" data-i18n="info_audio">Âm thanh kích hoạt</span><span class="v" id="iAudio">—</span></div>
-
-      <div class="grid" id="statsGrid">
-        <!-- Generated dynamically in popup.js -->
-      </div>
-    </div>
-
     <!-- ACTIONS -->
     <div class="sec">
       <div class="sec-title" data-i18n="sec_actions">Thao tác</div>
@@ -110,21 +137,21 @@
       </div>
     </div>
 
-  <!-- AUTHENTICATION SECTIONS -->
-  <div class="sec" id="tvAuthSec">
-    <div class="sec-title" data-i18n="sec_tv_auth">Đăng nhập TVHTML5</div>
-    <div id="tvAuthContent">
-      <div id="tvAuthStatus" style="font-size: 11px; margin-bottom: 6px; color: var(--dim);" data-i18n="tv_status_checking">Trạng thái: Đang kiểm tra...</div>
-      <div id="tvAuthCodeContainer" style="display: none; text-align: center; margin-bottom: 8px;">
-        <div style="font-size: 10px; color: var(--dim);"><span data-i18n="tv_enter_code">Nhập mã tại</span> <a href="https://youtube.com/activate" target="_blank" style="color: var(--accent);">youtube.com/activate</a></div>
-        <div id="tvAuthCode" style="font-size: 16px; font-weight: 700; letter-spacing: 2px; margin-top: 4px;"></div>
-      </div>
-      <div class="btns">
-        <button class="btn btn-p" id="btnTvLogin" data-i18n="btn_tv_login">Đăng nhập TV</button>
-        <button class="btn btn-s" id="btnTvLogout" style="display: none;" data-i18n="btn_tv_logout">Đăng xuất</button>
+    <!-- AUTHENTICATION SECTIONS -->
+    <div class="sec" id="tvAuthSec">
+      <div class="sec-title" data-i18n="sec_tv_auth">Đăng nhập TVHTML5</div>
+      <div id="tvAuthContent">
+        <div id="tvAuthStatus" style="font-size: 11px; margin-bottom: 6px; color: var(--dim);" data-i18n="tv_status_checking">Trạng thái: Đang kiểm tra...</div>
+        <div id="tvAuthCodeContainer" style="display: none; text-align: center; margin-bottom: 8px;">
+          <div style="font-size: 10px; color: var(--dim);"><span data-i18n="tv_enter_code">Nhập mã tại</span> <a href="https://youtube.com/activate" target="_blank" style="color: var(--accent);">youtube.com/activate</a></div>
+          <div id="tvAuthCode" style="font-size: 16px; font-weight: 700; letter-spacing: 2px; margin-top: 4px;"></div>
+        </div>
+        <div class="btns">
+          <button class="btn btn-p" id="btnTvLogin" data-i18n="btn_tv_login">Đăng nhập TV</button>
+          <button class="btn btn-s" id="btnTvLogout" style="display: none;" data-i18n="btn_tv_logout">Đăng xuất</button>
+        </div>
       </div>
     </div>
-  </div>
 
   </div>
 

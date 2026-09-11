@@ -25,6 +25,9 @@
       ctrl_stats_title: 'Ghi đè Thống kê chi tiết (Giả lập 774)',
       ctrl_stats_desc: 'Hiển thị thông số Opus 774 trong Thống kê chi tiết của trình phát',
       sec_status: 'Trạng thái',
+      audio_hero_title: 'Chất lượng âm thanh hiện tại',
+      audio_waiting: 'Đang chờ video YouTube...',
+      audio_disabled: 'Extension đã tắt',
       st_active: 'Hoạt động',
       st_inactive: 'Không hoạt động',
       st_disabled: 'Đã tắt',
@@ -69,6 +72,9 @@
       ctrl_stats_title: 'Stats for Nerds Override (774 Spoof)',
       ctrl_stats_desc: 'Display Opus 774 metrics in player Stats for Nerds',
       sec_status: 'Status',
+      audio_hero_title: 'Active Audio Stream',
+      audio_waiting: 'Waiting for YouTube video...',
+      audio_disabled: 'Extension Disabled',
       st_active: 'Active',
       st_inactive: 'Inactive',
       st_disabled: 'Disabled',
@@ -226,11 +232,25 @@
     }
     const stText = $('#stText');
     const stBadge = $('#stBadge');
+    const heroCard = $('#heroAudioCard');
+    const audioEl = $('#iAudio');
+    const methodEl = $('#iMethod');
+
     if (!isEnabled) {
       if (stText) stText.textContent = t('st_disabled');
       if (stBadge) {
-        stBadge.style.background = 'rgba(120, 120, 120, 0.2)';
-        stBadge.style.color = '#aaa';
+        stBadge.classList.add('off');
+      }
+      if (heroCard) {
+        heroCard.classList.remove('hq-active');
+      }
+      if (audioEl) {
+        audioEl.textContent = t('audio_disabled');
+        audioEl.style.color = 'var(--dim)';
+      }
+      if (methodEl) {
+        methodEl.textContent = 'OFF';
+        methodEl.style.color = 'var(--dim)';
       }
     }
   }
@@ -433,18 +453,28 @@
       }, (results) => {
         const d = results?.[0]?.result || {};
 
-        // Status badge
+        // Status badge & Hero card state
         const badge = $('#stBadge');
         const text = $('#stText');
+        const heroCard = $('#heroAudioCard');
+        const isHQ = d.activeAudioItag && String(d.activeAudioItag) === '774';
+
         if (!settings.enabled) {
           badge?.classList.add('off');
           if (text) text.textContent = t('st_disabled');
+          heroCard?.classList.remove('hq-active');
         } else if (d.activeAudioItag) {
           badge?.classList.remove('off');
           if (text) text.textContent = t('st_active');
+          if (isHQ) {
+            heroCard?.classList.add('hq-active');
+          } else {
+            heroCard?.classList.remove('hq-active');
+          }
         } else {
           badge?.classList.add('off');
           if (text) text.textContent = t('st_inactive');
+          heroCard?.classList.remove('hq-active');
         }
 
         // SW status ping
@@ -461,10 +491,10 @@
           }
         });
 
-        // Info
+        // Quick metrics
         const modeEl = $('#iMode');
         if (modeEl) {
-          modeEl.textContent = `${settings.operationMode || 'HYBRID_HQ'} (774 ★)`;
+          modeEl.textContent = `${settings.operationMode || 'HYBRID_HQ'}`;
         }
 
         const streamsEl = $('#iStreams');
@@ -473,7 +503,16 @@
         const methodEl = $('#iMethod');
         const audioEl = $('#iAudio');
 
-        if (d.fallbackReason) {
+        if (!settings.enabled) {
+          if (methodEl) {
+            methodEl.textContent = 'OFF';
+            methodEl.style.color = 'var(--dim)';
+          }
+          if (audioEl) {
+            audioEl.textContent = t('audio_disabled');
+            audioEl.style.color = 'var(--dim)';
+          }
+        } else if (d.fallbackReason) {
           if (methodEl) {
             methodEl.textContent = t('method_fallback');
             methodEl.style.color = '#e94560';
@@ -485,13 +524,18 @@
           }
         } else {
           if (methodEl) {
-            methodEl.style.color = 'var(--gold)';
+            methodEl.style.color = isHQ ? 'var(--gold)' : '#bbb';
             methodEl.textContent = d.activeMethod ? `${d.activeMethod} ${t('method_active_suffix')}` : t('method_original');
           }
           if (audioEl) {
-            audioEl.style.color = '';
             audioEl.style.fontSize = '';
-            audioEl.textContent = d.bestAudioInfo || '—';
+            if (d.bestAudioInfo) {
+              audioEl.textContent = d.bestAudioInfo;
+              audioEl.style.color = isHQ ? 'var(--gold)' : '#fff';
+            } else {
+              audioEl.textContent = t('audio_waiting');
+              audioEl.style.color = 'var(--dim)';
+            }
           }
         }
 
