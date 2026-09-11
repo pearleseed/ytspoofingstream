@@ -208,6 +208,9 @@
     if (navTargetVideoId && navTargetVideoId === vid) return true;
     const urlVid = (typeof getVideoIdFromUrl === 'function' ? getVideoIdFromUrl() : null);
     if (urlVid && urlVid === vid) return true;
+    if (typeof StudioEngine774 !== 'undefined' && StudioEngine774.activeVideoId === vid && typeof isPlayerActiveOnPage === 'function' && isPlayerActiveOnPage()) {
+      return true;
+    }
     return false;
   }
   const isCurrentTarget = isCurrentWatchVideo;
@@ -1288,12 +1291,6 @@
       document.addEventListener('resume', () => {
         this.onVisibilityResume();
       }, { passive: true });
-
-      // Clean teardown on YouTube SPA navigation
-      window.addEventListener('yt-navigate-start', () => {
-        console.log(TAG, '[NavigationLifecycle] yt-navigate-start detected, resetting playback state...');
-        this.resetForNewTrack();
-      }, { passive: true });
     },
 
     hookVideo(video) {
@@ -1926,15 +1923,20 @@
       this.syncVol(video);
       this.audio.playbackRate = video.playbackRate;
 
-      const drift = Math.abs(this.audio.currentTime - video.currentTime);
-      if (drift > 0.150 && !video.seeking) {
-        this.audio.currentTime = video.currentTime;
-      }
-
-      if (!video.paused && this.audio.paused) {
+      // Audio playing in background must NEVER stutter or seek on tab switch!
+      // In background/minimized tabs, <audio> is the Master Clock since it produces hardware sound.
+      if (!this.audio.paused && !this.audio.ended) {
+        const drift = this.audio.currentTime - video.currentTime;
+        if (Math.abs(drift) > 0.250 && !video.seeking) {
+          this._isInternalVideoSync = true;
+          video.currentTime = this.audio.currentTime;
+          setTimeout(() => { this._isInternalVideoSync = false; }, 250);
+        }
+        if (video.paused) {
+          video.play().catch(() => {});
+        }
+      } else if (this.audio.paused && !video.paused) {
         this.audio.play().catch(() => {});
-      } else if (video.paused && !this.audio.paused) {
-        this.audio.pause();
       }
     },
 

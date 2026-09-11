@@ -89,6 +89,10 @@ class MockElement extends MockEventTarget {
     return this.attributes.has(name) ? this.attributes.get(name) : null;
   }
 
+  hasAttribute(name) {
+    return this.attributes.has(name);
+  }
+
   removeAttribute(name) {
     this.attributes.delete(name);
     if (name === 'id') this.id = '';

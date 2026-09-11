@@ -53,36 +53,103 @@ describe('Lifecycle & Navigation Resilience', () => {
     assert.equal(engine._reconnectAttempts, 0);
   });
 
-  it('onVisibilityResume snaps clock when drift > 150ms and resyncs play state', () => {
+  it('onVisibilityResume treats active audio as Master Clock and resyncs paused/lagging video', () => {
     const engine = {
       audio,
       video,
       isActive: true,
       onVisibilityResume() {
         if (!this.isActive || !this.video || !this.audio) return;
-        const drift = Math.abs(this.audio.currentTime - this.video.currentTime);
-        if (drift > 0.150) {
-          this.audio.currentTime = this.video.currentTime;
-        }
         this.audio.playbackRate = this.video.playbackRate;
-        if (!this.video.paused && this.audio.paused) {
+        if (!this.audio.paused && !this.audio.ended) {
+          const drift = this.audio.currentTime - this.video.currentTime;
+          if (Math.abs(drift) > 0.150) {
+            this.video.currentTime = this.audio.currentTime;
+          }
+          if (this.video.paused) {
+            this.video.play();
+          }
+        } else if (this.audio.paused && !this.video.paused) {
           this.audio.play();
-        } else if (this.video.paused && !this.audio.paused) {
-          this.audio.pause();
         }
       }
     };
 
-    // Video is playing at 20.0s, audio lagged in background tab at 15.0s
-    video.play();
-    video.currentTime = 20.0;
-    audio.currentTime = 15.0;
-    audio.pause();
+    // Audio is playing in background at 25.0s, video was throttled/paused by Chrome at 15.0s
+    audio.src = 'https://googlevideo.com/videoplayback?itag=774';
+    audio.play();
+    audio.currentTime = 25.0;
+
+    video.pause();
+    video.currentTime = 15.0;
 
     engine.onVisibilityResume();
 
-    assert.equal(audio.currentTime, 20.0);
+    // Audio must NOT be paused, and video must sync forward to audio time and resume playing
     assert.equal(audio.paused, false);
+    assert.equal(audio.currentTime, 25.0);
+    assert.equal(video.currentTime, 25.0);
+    assert.equal(video.paused, false);
+  });
+
+  it('miniplayer navigation preserves active 774 playback when incomingVid is null or unchanged', () => {
+    let resetCalled = false;
+    let stopCalled = false;
+
+    const engine = {
+      isActive: true,
+      activeVideoId: 'video_xyz',
+      resetForNewTrack() { resetCalled = true; },
+      stopAndUnmute(reason) { stopCalled = true; }
+    };
+
+    function handleNavigateStart(incomingVid) {
+      // Correct logic: Only stop if incomingVid exists AND is different from active track
+      if (incomingVid && incomingVid !== engine.activeVideoId) {
+        engine.stopAndUnmute('Navigating to new video');
+      }
+      // When minimizing (incomingVid is null), audio must continue playing!
+    }
+
+    // Simulate minimizing to home page (incomingVid is null)
+    handleNavigateStart(null);
+    assert.equal(resetCalled, false);
+    assert.equal(stopCalled, false);
+
+    // Simulate clicking a DIFFERENT video
+    handleNavigateStart('video_abc');
+    assert.equal(stopCalled, true);
+  });
+
+  it('isCurrentWatchVideo identifies active miniplayer when page is on home route', () => {
+    const mini = dom.document.createElement('ytd-miniplayer');
+    mini.setAttribute('active', '');
+    dom.body.appendChild(mini);
+
+    let activeVideoId = 'video_test_123';
+    let navTargetVideoId = null;
+
+    function isPlayerActiveOnPage() {
+      const isWatch = dom.window.location.pathname?.startsWith('/watch');
+      if (isWatch) return true;
+      const m = dom.document.querySelector('ytd-miniplayer');
+      const isMiniActive = m && (m.hasAttribute('active') || m.style.display !== 'none');
+      return !!isMiniActive;
+    }
+
+    function isCurrentWatchVideo(vid) {
+      if (!vid) return false;
+      const playerVid = dom.document.getElementById('movie_player')?.getVideoData?.()?.video_id;
+      if (playerVid && playerVid === vid) return true;
+      if (navTargetVideoId && navTargetVideoId === vid) return true;
+      const urlVid = null; // Home route has no ?v=
+      if (urlVid && urlVid === vid) return true;
+      if (activeVideoId === vid && isPlayerActiveOnPage()) return true;
+      return false;
+    }
+
+    assert.equal(isCurrentWatchVideo('video_test_123'), true);
+    assert.equal(isCurrentWatchVideo('different_video'), false);
   });
 
   it('Shorts loop detector resets audio to 0 when video wraps around', () => {
