@@ -4,7 +4,7 @@
   <p><b>Kích Hoạt 100% Luồng Âm Thanh Studio Opus 774 Chuẩn Phòng Thu Trên Trình Duyệt YouTube</b></p>
 
   <p>
-    <a href="https://github.com/alithw/YTSpoofingStream/releases"><img src="https://img.shields.io/badge/release-v0.1.5-blue.svg?style=flat-square" alt="Phiên bản Mới nhất"></a>
+    <a href="https://github.com/alithw/YTSpoofingStream/releases"><img src="https://img.shields.io/badge/release-v0.1.6-blue.svg?style=flat-square" alt="Phiên bản Mới nhất"></a>
     <img src="https://img.shields.io/badge/manifest-v3-green.svg?style=flat-square" alt="Manifest V3">
     <img src="https://img.shields.io/badge/license-MIT-orange.svg?style=flat-square" alt="Giấy phép MIT">
     <img src="https://img.shields.io/badge/platform-Chrome%20%7C%20Edge%20%7C%20Brave-lightgrey?style=flat-square" alt="Nền tảng hỗ trợ">
@@ -28,8 +28,8 @@
 
 > [!TIP]
 > **Bạn đang sử dụng Mozilla Firefox / Firefox ESR?**  
-> Nhánh này (`main`) được cấu hình dành riêng cho **các trình duyệt Chromium** (Google Chrome, Brave, Microsoft Edge, Cốc Cốc, Opera).  
-> Nếu bạn sử dụng **Mozilla Firefox**, vui lòng chuyển sang nhánh [**`firefox`**](https://github.com/alithw/YTSpoofingStream/tree/firefox) hoặc tải trực tiếp gói cài đặt đã ký số [**`YTSS-0.1.5.xpi`**](https://github.com/alithw/YTSpoofingStream/raw/firefox/YTSS-0.1.5.xpi) để cài đặt vĩnh viễn!
+> Nhánh này (`main`) được cấu hình dành riêng cho **các trình duyệt nhân Chromium** (Google Chrome, Brave, Microsoft Edge, Opera).  
+> Nếu bạn sử dụng **Mozilla Firefox**, vui lòng chuyển sang nhánh [**`firefox`**](https://github.com/alithw/YTSpoofingStream/tree/firefox) hoặc tải trực tiếp gói cài đặt đã ký số [**`YTSS-0.1.6.xpi`**](https://github.com/alithw/YTSpoofingStream/raw/firefox/YTSS-0.1.6.xpi) để cài đặt vĩnh viễn!
 
 *Đọc bằng ngôn ngữ khác: [English](README.md).*
 

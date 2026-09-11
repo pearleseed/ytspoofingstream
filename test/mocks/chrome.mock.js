@@ -95,7 +95,7 @@ export function createMockChrome() {
   const mock = {
     runtime: {
       lastError: null,
-      getManifest: () => ({ version: '0.1.5', name: 'YTSpoofingStream' }),
+      getManifest: () => ({ version: '0.1.6', name: 'YTSpoofingStream' }),
       onMessage: runtimeMessageListeners,
       sendMessage(msg, callback) {
         let responded = false;

@@ -1,6 +1,6 @@
 {
   "name": "ytspoofingstream",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Force 100% genuine Studio Opus 774 on YouTube via Dual-Stream Synchronization Engine",
   "type": "module",
   "scripts": {
